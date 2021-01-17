@@ -1,208 +1,310 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const NODE_COST = 1,
-        WEIGHTED_NODE_COST = 2,
-        RANDOM_MAZE_FREQUENCY = 5;
+    const MAX_BAR_COUNT = 200,
+        MAX_BAR_COUNT_TEXT = 45,
+        MAX_BAR_VALUE = 1000,
+        TOP_PADDING = 20;
 
-    let currArr, pathSearchFinished, svg, width, height,
-        colCount, cellSize, tempCount, rowCount,
-        startNode, endNode, weightedGraph, unweightedGraph,
-        span_start, span_end, dragged, draggedNeighbor, draggedClass,
-        changeRectTypeEnabled, speed, currObstacle,
-        totalCost, totalNodesVisited, descriptions;
+    let currArr, sortFinished, textModeEnabled, svg, width, height,
+        speed, comparisons, arrayAccesses, descriptions,
+        barCount, barPadding, barWidth, maxVal, yScale;
 
-    pathSearchFinished = false;
+    sortFinished = false;
+    textModeEnabled = true;
     svg = document.querySelector('svg');
     width = parseInt(window.getComputedStyle(svg).getPropertyValue('width'));
     height = window.innerHeight * .7;
-    colCount = parseInt(document.getElementById('dimension').value);
-    cellSize = width / colCount;
-    tempCount = Math.floor(height / cellSize);
-    rowCount = tempCount % 2 == 1 ? tempCount : tempCount - 1;
-    changeRectTypeEnabled = true, speed = parseInt(document.getElementById('delay').value);
-    currObstacle = getSelectedRadioValue("obstacle");
-    totalCost = 0;
-    totalNodesVisited = 0;
+    barCount = parseInt(document.getElementById('bar_count').value);
+    // barWidth = width / barCount;
+    barPadding = 1;
+    barWidth = (width + barPadding) / barCount - barPadding;
+    speed = parseInt(document.getElementById('delay').value);
+    comparisons = 0;
+    arrayAccesses = 0;
     descriptions = {
-        'dijkstras': "<b>Dijkstra's Algorithm</b> exploits BFS, checks nodes consequently",
-        'a_star': "<b>A*</b> heads towards the target, counts on G/H/F costs",
-        'bfs': "<b>Breadth-First Search</b> relies on a <i>queue</i>",
-        'dfs_iterative': "<b>Deapth-First Search (Iterative)</b> relies on a <i>stack</i>",
-        'dfs_recursive': "<b>Deapth-First Search (Recursive)</b> relies on a <i>call stack</i>",
-        'recursive_division': "<b>Recursive Division</b> exploits backtracking and DFS",
-        'binary': "<b>Binary Maze</b> algorithm randomly carves a passage either down or right",
-        'random': "<b>Random Maze</b> selects random spots for obstacles"
+        'bubble_sort': "<b>Bubble Sort</b> 'bubbles up' max values on top <br> Time: <i>O(n<sup>2</sup>)</i>; Space: <i>O(1)</i>",
+        'selection_sort': "<b>Selection Sort</b> sifts down min values <br> Time: <i>O(n<sup>2</sup>)</i>; Space: <i>O(1)</i>",
+        'insertion_sort': "<b>Insertion Sort</b> inserts elements on their spot one by one in the left sorted part <br> Time: <i>O(n<sup>2</sup>)</i>; Space: <i>O(1)</i>",
+        'radix_sort': "<b>Radix Sort</b> distributes values in buckets based on their radix; no comparisons <br> Time: <i>O(nk)</i>; Space: <i>O(n + k)</i><span class='data'>, where n - arr length; k - max num of digits</span>",
+        'merge_sort': "<b>Merge Sort</b> splits array into 1-element sub-arrays, then merges them together <br> Time: <i>O(nlogn)</i>; Space: <i>O(n)</i>",
+        'quick_sort': "<b>Quick Sort</b> selects and places the 'pivots' in correct spots <br> Time: <i>O(n<sup>2</sup>)</i>; Space: <i>O(1)</i>",
+        'heap_sort': "<b>Heap Sort</b> exploits max heap <br> Time: <i>O(nlogn)</i>; Space: <i>O(1)</i>"
     }
 
+    // PRELOADED ARRAY ==============================================
+    svg = d3.select('svg');
 
-    document.getElementById('grid_dimension').innerText = colCount;
-    document.getElementById('animation_delay').innerText = speed;
-    svg.setAttribute('height', rowCount * cellSize);
-
-    drawGrid();
-
-
+    generateRandomArray();
 
     // EVENT HANDLERS ============================================================
-    document.querySelector('#launch')
-        .addEventListener('click', launch);
+    document.getElementById('count').innerText = barCount;
+    document.getElementById('animation_delay').innerText = speed;
+    svg.attr('height', height);
 
-    document.querySelector('#apply')
-        .addEventListener('click', apply);
+    d3.select('#mode_day').on('click', () => {
+        document.querySelector('body').classList = '';
+        document.querySelector('#values').classList = '';
+    });
 
-    document.querySelector('#clean')
-        .addEventListener('click', cleanPath);
+    d3.select('#mode_night').on('click', () => {
+        document.querySelector('body').classList = 'night_mode';
+        document.querySelector('#values').classList = 'night_mode';
+    });
 
-    document.querySelector('#reset')
-        .addEventListener('click', resetField);
 
-    document.getElementById('mode_day')
-        .addEventListener('click', () => {
-            document.querySelector('body').classList = '';
-        });
 
-    document.getElementById('mode_night')
-        .addEventListener('click', () => {
-            document.querySelector('body').classList = 'night_mode';
-        });
+    d3.select('#text_true').on('click', () => {
+        textModeEnabled = true;
+        document.getElementById('bar_count').setAttribute('max', MAX_BAR_COUNT_TEXT);
+        if (barCount > MAX_BAR_COUNT_TEXT) {
+            barCount = MAX_BAR_COUNT_TEXT;
+            document.getElementById('bar_count').setAttribute('value', MAX_BAR_COUNT_TEXT);
+            inputBarCount();
+            changeBarCount();
+        }
+        else {
+            showText();
+        }
+    });
 
-    document.getElementById('delay')
-        .addEventListener("input", () => {
-            speed = parseInt(document.getElementById('delay').value);
-            document.getElementById('animation_delay').innerText = speed;
-        });
+    d3.select('#text_false').on('click', () => {
+        textModeEnabled = false;
+        document.getElementById('bar_count').setAttribute('max', MAX_BAR_COUNT);
 
-    document.getElementById('dimension')
-        .addEventListener("input", () => {
-            colCount = parseInt(document.getElementById('dimension').value);
-            document.getElementById('grid_dimension').innerText = colCount;
-        });
+        hideText();
+    });
 
-    document.getElementById('dimension')
-        .addEventListener("change", () => {
-            let defs = document.querySelector('defs');
-            svg.innerHTML = `<defs>${defs.innerHTML}</defs>`;
-            cellSize = width / colCount;
-            tempCount = Math.floor(height / cellSize);
-            rowCount = tempCount % 2 == 1 ? tempCount : tempCount - 1;
-            svg.setAttribute('height', rowCount * cellSize);
-            drawGrid();
-        });
 
-    svg.addEventListener('mousedown', dragStart);
 
-    function dragStart(event) {
-        if (event.target.classList.contains('draggable')) {
-            dragged = event.target;
-            draggedNeighbor = dragged.parentNode.querySelector('[id*="_"]');
-            if (draggedNeighbor.classList.length > 0) draggedClass = draggedNeighbor.classList[0]; // can be start/end
-            changeRectTypeEnabled = false;
+    document.getElementById('delay').addEventListener("input", () => {
+        speed = parseInt(document.getElementById('delay').value);
+        document.getElementById('animation_delay').innerText = speed;
+    });
+
+    document.getElementById('bar_count').addEventListener("input", inputBarCount);
+
+    document.getElementById('bar_count').addEventListener("change", changeBarCount);
+
+    function inputBarCount() {
+        barCount = parseInt(document.getElementById('bar_count').value);
+        document.getElementById('count').innerText = barCount;
+    }
+
+    function changeBarCount() {
+        let vals = createRandomArray();
+        barWidth = (width + barPadding) / barCount - barPadding;
+        draw(vals);
+
+        textModeEnabled ? showText() : hideText();
+    }
+
+    // generate a new CUSTOM array
+    document.getElementById('apply')
+        .addEventListener('click', generateCustomArray);
+
+    // generate a new RANDOM array
+    document.getElementById('generate')
+        .addEventListener('click', generateRandomArray);
+
+    // sort button
+    document.getElementById('sort')
+        .addEventListener('click', sort);
+
+    document.getElementsByName('sort').forEach(e => e.addEventListener('click', generateRandomArray));
+
+
+    function hideText() {
+        let textElem = document.getElementsByTagName('text');
+        for (let t of textElem) {
+            t.classList = 'hidden';
         }
     }
 
-    function dragEnter(e) {
-        if (e.which == 1 && dragged != null) {
-            let currElem = getCurrElement(e);
-
-            // highlight potential drop target when the draggable element enters it
-            // and reset background of potential drop target when the draggable element leaves it
-            if (currElem.nodeName === "rect") {
-                draggedNeighbor.classList.remove(draggedClass);
-                if (draggedNeighbor.classList.contains('wall')) {
-                    currArr[draggedNeighbor.getAttribute('row')][draggedNeighbor.getAttribute('col')] = null; // restores a wall
-                }
-
-                currElem.classList.add(draggedClass);
-                draggedNeighbor = currElem;
-                if (currElem.classList.contains('wall')) {
-                    currArr[currElem.getAttribute('row')][currElem.getAttribute('col')] = currElem; // resets currArr rect in case of a wall
-                }
-
-                if (pathSearchFinished) {
-                    if (draggedClass == 'start') startNode = currElem.getAttribute('id');
-                    else if (draggedClass == 'end') endNode = currElem.getAttribute('id');
-
-                    launch(e, true);
-                }
-            }
+    function showText() {
+        let textElem = document.getElementsByTagName('text');
+        for (let t of textElem) {
+            t.classList = '';
         }
     }
 
-    function drop(e) {
-        if (e.which == 1 && dragged != null) {
-            let currElem = getCurrElement(e),
-                temp = currElem.parentNode.querySelector('[id*="_"]');
-
-            changeRectTypeEnabled = true;
-
-            // highlight potential drop target when the draggable element enters it
-            if (currElem.nodeName === "rect") {
-                dragged.setAttribute('x', temp.getAttribute('x'));
-                dragged.setAttribute('y', temp.getAttribute('y'));
-
-                dragged.parentNode.removeChild(dragged);
-                currElem.parentNode.appendChild(dragged);
-
-                if (draggedClass == 'start') {
-                    startNode = currElem.getAttribute('id');
-                    currElem.classList = 'start';
-                }
-                else if (draggedClass == 'end') {
-                    endNode = currElem.getAttribute('id');
-                    currElem.classList = 'end';
-                }
-
-                // currElem.classList.add(draggedClass);
-                currArr[currElem.getAttribute('row')][currElem.getAttribute('col')] = currElem; // resets currArr rect in case of a wall
-                dragged = null;
-            }
+    // construct array of object from array of integers
+    function createCustomArray(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            arr[i] = parseInt(arr[i]);
         }
+        return arr;
     }
 
-    function getCurrElement(e) {
-        let x = e.clientX,
-            y = e.clientY,
-            currElem = document.elementFromPoint(x, y);
+    function enableControls(enabled) {
+        document.getElementsByName('sort').forEach(e => e.disabled = !enabled);
+        document.getElementsByName('text').forEach(e => e.disabled = !enabled);
 
-        return currElem;
+        document.getElementById('sort').disabled = !enabled;
+        document.getElementById('bar_count').disabled = !enabled;
+        document.getElementById('generate').disabled = !enabled;
+        document.getElementById('apply').disabled = !enabled;
     }
+
+    function updateDisplayData(algorithmName = null, desc = null) {
+        if (algorithmName != null) document.getElementById('description').innerHTML = descriptions[algorithmName];
+        else document.getElementById('description').innerHTML = desc;
+    }
+
+    function updateNumbers() {
+        document.getElementById('comparisons').innerHTML = comparisons > 0 ? `${comparisons}` : `N/A`;
+
+        document.getElementById('array_manipulations').innerHTML = arrayAccesses > 0 ? `${arrayAccesses}` : `N/A`;
+    }
+
+    // construct a random array
+    function createRandomArray(arr) {
+        // let numBars = Math.round(Math.random() * 500) + 50; // from 5 to 15
+        let numBars = barCount;
+        let newArr = new Array(numBars);
+        for (let i = 0; i < newArr.length; i++) {
+            newArr[i] = Math.round(Math.random() * MAX_BAR_VALUE);
+        }
+        return newArr;
+    }
+
 
     // UTILITY METHODS ============================================================
-    function drawGrid() {
-        currArr = new Array(rowCount);
-        pathSearchFinished = false;
+    async function sort() {
+        currArr = Array.from(document.getElementsByTagName('rect'));
+        // drop-down
+        let sortType = getSelectedRadioValue("sort");
 
-        for (let row = 0; row < rowCount; row++) {
-            currArr[row] = new Array(colCount);
-            for (let col = 0; col < colCount; col++) {
-                let g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
-                let rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-                rect.setAttribute('width', cellSize);
-                rect.setAttribute('height', cellSize);
-                rect.setAttribute('x', col * cellSize);
-                rect.setAttribute('y', row * cellSize);
-                rect.setAttribute('row', row);
-                rect.setAttribute('col', col);
-                rect.setAttribute('id', `${row}_${col}`);
+        comparisons = 0;
+        arrayAccesses = 0;
 
-                rect.addEventListener('click', changeRectType);
-                rect.addEventListener('mouseover', changeRectType);
-                rect.addEventListener("mouseenter", dragEnter);
-                rect.addEventListener("mouseup", drop);
+        updateDisplayData(sortType);
+        updateNumbers();
 
-                g.appendChild(rect);
-                document.querySelector('svg').appendChild(g);
+        enableControls(false);
 
-                currArr[row][col] = rect;
+        if (sortType === 'bubble_sort') {
+            await bubbleSort(currArr);
+        } else if (sortType === 'selection_sort') {
+            await selectionSort(currArr);
+        } else if (sortType === 'insertion_sort') {
+            await insertionSort(currArr);
+        } else if (sortType === 'merge_sort') {
+            await mergeSort(currArr);
+            currArr.forEach(r => r.classList = 'sorted');
+            await pause(speed);
+            currArr.forEach(r => r.classList = '');
+        } else if (sortType === 'quick_sort') {
+            await quickSort(currArr);
+        } else if (sortType === 'radix_sort') {
+            await radixSort(currArr);
+        } else if (sortType === 'heap_sort') {
+            await heapSort(currArr);
+        }
+
+        updateNumbers();
+        enableControls(true);
+    }
+
+    function findMaxVal(arr) {
+        let max = -Infinity;
+        for (let elem of arr) {
+            max = Math.max(max, elem);
+        }
+        return max;
+    }
+
+    function generateCustomArray() {
+        let values = d3.select('#values').property('value').trim();
+        let nums = values.split(' ');
+        let error = false;
+
+        document.getElementById('errors').innerText = '';
+
+        if (nums.length < 10 || nums.length > 50 || nums[0] === '') {
+            document.getElementById('errors').innerText = 'Number of elements must be from 10 to 50';
+            return;
+        }
+
+        for (let num of nums) {
+            if (isNaN(num) || num == '' || num % 1 !== 0 || num < 0) {
+                error = true;
+                break;
             }
         }
 
-        placeStartEndNodes();
+        if (error) {
+            document.getElementById('errors').innerText = 'Check values for correctness';
+        } else {
+            let vals = createCustomArray(nums);
 
-        document.getElementById('description').innerHTML = "<b>Choose Algorithm/Maze To Animate</b>";
+            barCount = vals.length;
+            document.getElementById('bar_count').setAttribute('value', barCount);
+            inputBarCount();
+            barWidth = (width + barPadding) / barCount - barPadding;
+            draw(vals);
+
+            comparisons = 0;
+            arrayAccesses = 0;
+
+            document.getElementById('values').value = '';
+        }
     }
+
+    function generateRandomArray() {
+        let vals = createRandomArray();
+        draw(vals);
+
+        comparisons = 0;
+        arrayAccesses = 0;
+    }
+
+    function draw(arr) {
+        maxVal = findMaxVal(arr);
+
+        yScale = d3.scaleLinear()
+            .domain([0, maxVal])
+            .range([0, height - TOP_PADDING]);
+
+        // UPDATE selection
+        let updateSelection = svg.selectAll('.bar')
+            .data(arr);
+
+        // EXIT selection
+        updateSelection.exit()
+            .remove();
+
+        // ENTER selection
+        let enterSelection = updateSelection
+            .enter()
+            .append('g')
+            .classed('bar', true);
+
+        enterSelection.append('rect');
+        enterSelection.append('text');
+
+        enterSelection.merge(updateSelection)
+            .select('rect')
+            .attr('width', barWidth)
+            .attr('height', d => yScale(d))
+            .attr('x', (d, i) => (barWidth + barPadding) * i)
+            .attr('y', d => height - yScale(d))
+            .attr('val', d => d);
+
+        enterSelection.merge(updateSelection)
+            .select('text')
+            .text(d => d)
+            .attr('x', (d, i) => (barWidth + barPadding) * i + barWidth / 2)
+            .attr('y', d => height - 10)
+            .attr('text-anchor', 'middle');
+    }
+
+
 
     function pause(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function getRectValue(rect) {
+        return parseInt(rect.getAttribute('val'))
     }
 
     function getSelectedRadioValue(name) {
@@ -215,880 +317,487 @@ document.addEventListener('DOMContentLoaded', () => {
         return undefined;
     }
 
-    function changeRectType(e) {
-        if (e.which == 1 && changeRectTypeEnabled) {
-            let currElem = getCurrElement(e);
 
-            currObstacle = getSelectedRadioValue("obstacle");
 
-            if (currElem.nodeName === "rect") {
-                if (!currElem.classList.contains('start') &&
-                    !currElem.classList.contains('end')) {
-                    let row = parseInt(currElem.getAttribute('row'));
-                    let col = parseInt(currElem.getAttribute('col'));
 
-                    if (!currElem.classList.contains(currObstacle)) {
-                        if (currObstacle == 'wall') {
-                            currArr[row][col] = null;
-                        }
-                        else if (currObstacle == 'weight') {
-                            currArr[row][col] = document.getElementById(`${row}_${col}`);
-                        }
 
-                        currElem.classList = currObstacle; // applied to all obstacle types
-                    }
-                    else {
-                        currElem.classList.remove(currObstacle);
-                        currArr[row][col] = document.getElementById(`${row}_${col}`);
-                    }
-                }
-            }
-        }
-    }
 
-    // cleans just path drawn, leaves the walls & start/end nodes
-    function cleanPath() {
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                let currElem = currArr[row][col];
-                if (currElem != null &&
-                    !currElem.classList.contains('start') &&
-                    !currElem.classList.contains('end')) {
-                    if (currElem.classList.contains('weight')) {
-                        currElem.classList = 'weight';
-                    }
-                    else {
-                        currElem.classList = '';
-                    }
-                }
-            }
-        }
 
-        pathSearchFinished = false;
-        document.getElementById('description').innerHTML = "<b>Choose Algorithm/Maze To Animate</b>";
-    }
 
-    // removes everything from the field
-    // optionally removes start/end nodes
-    function resetField(e, removeKeyNodes = false) {
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                let currElem = currArr[row][col];
-                if (currElem == null) {
-                    currArr[row][col] = document.getElementById(`${row}_${col}`);
-                    currElem = currArr[row][col];
-                    currElem.classList = '';
-                }
-                else if (currElem.classList.contains('weight')) {
-                    currElem.classList = '';
-                }
-                else if (removeKeyNodes && (currElem.classList.contains('start') ||
-                    currElem.classList.contains('end'))) {
-                    currElem.classList = '';
-                    currElem.setAttribute('draggable', 'false');
-                }
-            }
-        }
 
-        cleanPath();
 
-        // if (removeKeyNodes) placeStartEndNodes();
-    }
+    // SORTING ALGORITHMS ========================================================================================================================================================================================================================== 
+    // BUBBLE SORT =============================================================================================================
+    async function bubbleSort(arr) {
+        let swapped = false;
 
-    function placeStartEndNodes(gap = 2) {
-        let middleRow = Math.floor(rowCount / 2);
-        startNode = `${middleRow}_${gap}`;
-        endNode = `${middleRow}_${colCount - gap - 1}`;
-
-        let oldStartNodes = document.getElementsByClassName('start');
-        let oldEndNodes = document.getElementsByClassName('end');
-        let oldNodes = [...oldStartNodes, ...oldEndNodes];
-        for (let n of oldNodes) {
-            n.classList.remove('start');
-            n.classList.remove('end');
-        }
-
-        let start = document.getElementById(startNode);
-        start.classList = 'start';
-        if (currArr[middleRow][gap] == null) currArr[middleRow][gap] = start;
-
-        let end = document.getElementById(endNode);
-        end.classList = 'end';
-        if (currArr[middleRow][colCount - gap - 1] == null) currArr[middleRow][colCount - gap - 1] = end;
-
-        let oldSpans = document.getElementsByClassName('draggable');
-        for (let s of oldSpans) {
-            s.remove();
-        }
-
-        span_start = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-        span_start.classList = 'draggable';
-        span_start.setAttribute('width', start.getAttribute('width'));
-        span_start.setAttribute('height', start.getAttribute('height'));
-        span_start.setAttribute('x', start.getAttribute('x'));
-        span_start.setAttribute('y', start.getAttribute('y'));
-
-        span_end = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-        span_end.classList = 'draggable';
-        span_end.setAttribute('width', end.getAttribute('width'));
-        span_end.setAttribute('height', end.getAttribute('height'));
-        span_end.setAttribute('x', end.getAttribute('x'));
-        span_end.setAttribute('y', end.getAttribute('y'));
-
-        start.parentNode.appendChild(span_start);
-        end.parentNode.appendChild(span_end);
-    }
-
-    async function launch(e, ignorePause = false) {
-        let path = [];
-        let algoType = getSelectedRadioValue("algo");
-
-        // buildUnweightedGraph();
-        // await unweightedGraph.generateMaze();
-
-        cleanPath();
-        if (ignorePause) pathSearchFinished = true;
-        totalCost = 0;
-        totalNodesVisited = 0;
-
-        // algorithms on weighted graphs
-        if (algoType === 'dijkstras' || algoType === 'a_star') {
-            // build weighted graph
-            buildWeightedGraph();
-
-            if (algoType === 'dijkstras') {
-                path = await weightedGraph.dijkstraAlgorithm(startNode, endNode, ignorePause);
-            } else if (algoType === 'a_star') {
-                path = await weightedGraph.aStar(startNode, endNode, ignorePause);
-            }
-            await buildPath(path, ignorePause);
-        }
-        // algorithms on unweighted graphs
-        else if (algoType === 'bfs' || algoType === 'dfs_iterative' || algoType === 'dfs_recursive') {
-            // build unweighted graph
-            buildUnweightedGraph();
-
-            if (algoType === 'bfs') {
-                path = await unweightedGraph.bfs(startNode, endNode, ignorePause);
-            } else if (algoType === 'dfs_iterative') {
-                path = await unweightedGraph.dfsIterative(startNode, endNode, ignorePause);
-            } else if (algoType === 'dfs_recursive') {
-                path = await unweightedGraph.dfsRecursive(startNode, endNode, ignorePause);
-            }
-            confirmPath(path);
-        }
-
-        updateDisplayData(algoType);
-    }
-
-    function updateDisplayData(algorithmName) {
-        document.getElementById('description').innerHTML = descriptions[algorithmName];
-
-        document.getElementById('cost').innerHTML = totalCost > 0 ? `<u>Cost: ${totalCost}</u>` : `<u>Cost: N/A</u>`;
-
-        document.getElementById('nodes_visited').innerHTML = totalNodesVisited > 0 ? `<u>Nodes Visited: ${totalNodesVisited}</u>` : `<u>Nodes Visited: N/A</u>`;
-    }
-
-    // function for maze generation
-    async function apply(e) {
-        let mazeType = getSelectedRadioValue("maze");
-
-        resetField(e, true);
-
-        buildWeightedGraph();
-
-        totalCost = 0;
-        totalNodesVisited = 0;
-
-        if (mazeType === 'recursive_division') {
-            path = await generateRecursiveDivisionMaze();
-        } else if (mazeType === 'binary') {
-            path = await generateBinaryMaze();
-        } else if (mazeType === 'random') {
-            path = await generateRandomMaze();
-        }
-
-        placeStartEndNodes();
-        updateDisplayData(mazeType);
-    }
-
-    function buildWeightedGraph() {
-        weightedGraph = new WeightedGraph();
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                if (currArr[row][col] != null) {
-                    weightedGraph.addVertex(currArr[row][col].getAttribute('id'));
-                }
-            }
-        }
-
-        for (let node in weightedGraph.adjacencyList) {
-            let adjacentNodes = getAdjacentNodes(document.getElementById(node));
-            for (let n of adjacentNodes) {
-                if (n.classList.contains('weight') || document.getElementById(node).classList.contains('weight')) { // if weighted node
-                    weightedGraph.addEdge(node, n.getAttribute('id'), WEIGHTED_NODE_COST);
-                }
-                else {
-                    weightedGraph.addEdge(node, n.getAttribute('id'), NODE_COST);
-                }
-            }
-        }
-    }
-
-    function buildUnweightedGraph() {
-        unweightedGraph = new UnweightedGraph();
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                if (currArr[row][col] != null) {
-                    unweightedGraph.addVertex(currArr[row][col].getAttribute('id'));
-                }
-            }
-        }
-
-        for (let node in unweightedGraph.adjacencyList) {
-            let adjacentNodes = getAdjacentNodes(document.getElementById(node));
-            for (let n of adjacentNodes) {
-                unweightedGraph.addEdge(node, n.getAttribute('id'));
-            }
-        }
-    }
-
-    async function buildPath(path, ignorePause) {
-        for (let nodeId of path) {
-            if (nodeId != startNode && nodeId != endNode) {
-                let node = document.getElementById(nodeId);
-                if (!ignorePause) await pause(speed);
-                node.classList = node.classList.contains('weight') ? 'path weight' : 'path';
-            }
-        }
-    }
-
-    function confirmPath(path) {
-        for (let nodeId of path) {
-            if (nodeId != startNode && nodeId != endNode) {
-                let node = document.getElementById(nodeId);
-                node.classList = node.classList.contains('weight') ? 'path weight' : 'path';
-            }
-        }
-    }
-
-    function getAdjacentNodes(rect) {
-        let currRow = parseInt(rect.getAttribute('row'));
-        let currCol = parseInt(rect.getAttribute('col'));
-        let adjacentNodes = [];
-
-        if (currRow > 0 && currArr[currRow - 1][currCol] != null) adjacentNodes.push(currArr[currRow - 1][currCol]);
-        if (currRow < rowCount - 1 && currArr[currRow + 1][currCol] != null) adjacentNodes.push(currArr[currRow + 1][currCol]);
-        if (currCol > 0 && currArr[currRow][currCol - 1] != null) adjacentNodes.push(currArr[currRow][currCol - 1]);
-        if (currCol < colCount - 1 && currArr[currRow][currCol + 1] != null) adjacentNodes.push(currArr[currRow][currCol + 1]);
-
-        return adjacentNodes;
-    }
-
-    class Node {
-        constructor(val, priority) {
-            this.val = val;
-            this.priority = priority;
-        }
-    }
-
-    class PriorityQueue {
-        constructor() {
-            this.values = [];
-        }
-
-        enqueue(val, priority) {
-            let node = new Node(val, priority);
-            this.values.push(node);
-            let currIdx = this.values.length - 1;
-            let parentIdx = Math.floor((currIdx - 1) / 2);
-            while (this.values[parentIdx] !== undefined && this.values[currIdx] !== undefined && this.values[parentIdx].priority > this.values[currIdx].priority) {
-                [this.values[parentIdx], this.values[currIdx]] = [this.values[currIdx], this.values[parentIdx]];
-                currIdx = parentIdx;
-                parentIdx = Math.floor((currIdx - 1) / 2);
-            }
-            return this;
-        }
-
-        dequeue() {
-            let parentIdx = 0, leftIdx, rightIdx, minIdx, del, arr = this.values;
-            if (arr.length === 0) return undefined;
-            [arr[0], arr[arr.length - 1]] = [arr[arr.length - 1], arr[0]];
-            del = arr.pop();
-            while (minIdx !== null) {
-                leftIdx = 2 * parentIdx + 1;
-                rightIdx = 2 * parentIdx + 2;
-                minIdx = null;
-                if (leftIdx < arr.length) {
-                    if (arr[leftIdx].priority < arr[parentIdx].priority) {
-                        minIdx = leftIdx;
-                    }
-                }
-                if (rightIdx < arr.length) {
-                    if ((minIdx === null && arr[rightIdx].priority < arr[parentIdx].priority) || (minIdx !== null && arr[rightIdx].priority < arr[leftIdx].priority)) {
-                        minIdx = rightIdx;
-                    }
-                }
-                if (minIdx !== null) [arr[parentIdx], arr[minIdx]] = [arr[minIdx], arr[parentIdx]];
-                parentIdx = minIdx;
-            }
-            this.values = arr;
-            return del.val;
-        }
-
-        // if there are many nodes with the same priority,
-        // choose one with lowest H cost
-        adjustPriorityQueue(distances) {
-            let topNode = this.values[0];
-            let topPriority = topNode.priority;
-            let minIdx = 0;
-
-            for (let i = 1; i < this.values.length; i++) {
-                let node = this.values[i];
-                if (node.priority == topPriority && distances[node.val]['H'] <= distances[this.values[minIdx].val]['H']) {
-                    minIdx = i;
-                }
-            }
-
-            if (minIdx != 0) {
-                [this.values[0], this.values[minIdx]] = [this.values[minIdx], this.values[0]];
-            }
-        }
-    }
-
-    class WeightedGraph {
-        constructor() {
-            this.adjacencyList = {};
-        }
-
-        addVertex(vtx) {
-            if (!this.adjacencyList[vtx]) {
-                this.adjacencyList[vtx] = [];
-            }
-        }
-
-        addEdge(vtx1, vtx2, weight) {
-            if (this.adjacencyList[vtx1] && this.adjacencyList[vtx2] &&
-                !this.includes(vtx1, vtx2) && !this.includes(vtx2, vtx1)) {
-                this.adjacencyList[vtx1].push({ val: vtx2, weight });
-                this.adjacencyList[vtx2].push({ val: vtx1, weight });
-            }
-        }
-
-        includes(vtx1, vtx2) {
-            for (let vtx of this.adjacencyList[vtx1]) {
-                if (vtx.val === vtx2) return true;
-            }
-            return false;
-        }
-
-        async dijkstraAlgorithm(start, end, ignorePause) {
-            let distances = {},
-                previous = {},
-                pq = new PriorityQueue(),
-                vtx, distance;
-            // set up
-            for (let v in this.adjacencyList) {
-                v === start ? distances[v] = 0 : distances[v] = Infinity;
-                pq.enqueue(v, distances[v]);
-                previous[v] = null;
-            }
-            // algorithm
-            while (pq.values.length !== 0) {
-                vtx = pq.dequeue();
-                if (vtx != startNode && vtx != endNode) {
-                    if (!ignorePause) await pause(speed);
-                    document.getElementById(vtx).classList.add('visited');
-                }
-                if (vtx === end) {
-                    pathSearchFinished = true;
-                    totalCost = distances[end];
-                    return this.makePath(previous, end);
-                }
-                for (let v of this.adjacencyList[vtx]) {
-                    distance = distances[vtx] + v.weight;
-                    if (distance < distances[v.val]) {
-                        distances[v.val] = distance;
-                        previous[v.val] = vtx;
-                        pq.enqueue(v.val, distances[v.val]);
-                    }
-                }
-            }
-
-            return undefined;
-        }
-
-        async aStar(start, end, ignorePause) {
-            let distances = {}, // stores G, H, and F costs
-                previous = {},
-                pq = new PriorityQueue(),
-                vtx, distance;
-            // set up
-            for (let v in this.adjacencyList) {
-                distances[v] = {};
-                if (v === start) {
-                    distances[v]['G'] = 0;
-                    distances[v]['H'] = this.getDistance(v, endNode);
-                    distances[v]['F'] = distances[v]['H'];
-                } else {
-                    distances[v]['G'] = Infinity;
-                    distances[v]['H'] = Infinity;
-                    distances[v]['F'] = Infinity;
-                }
-                pq.enqueue(v, distances[v]['F']);
-                previous[v] = null;
-            }
-            // algorithm
-            while (pq.values.length !== 0) {
-                pq.adjustPriorityQueue(distances);
-                vtx = pq.dequeue();
-                if (vtx != startNode && vtx != endNode) {
-                    if (!ignorePause) await pause(speed);
-                    document.getElementById(vtx).classList.add('visited');
-                }
-                if (vtx === end) {
-                    pathSearchFinished = true;
-                    totalCost = distances[end]['F'];
-                    return this.makePath(previous, end);
-                }
-                for (let v of this.adjacencyList[vtx]) {
-                    distance = distances[vtx]['G'] + v.weight; // G cost of the v
-                    if (distance < distances[v.val]['G']) {
-                        distances[v.val]['G'] = distance;
-                        distances[v.val]['H'] = this.getDistance(v.val, endNode);
-                        distances[v.val]['F'] = distances[v.val]['G'] + distances[v.val]['H'];
-                        previous[v.val] = vtx;
-                        pq.enqueue(v.val, distances[v.val]['F']);
-                    }
-                }
-            }
-
-            return undefined;
-        }
-
-        // distance to the end node
-        getDistance(node, endNode) {
-            let coord1 = this.getCoordinates(node);
-            let coord2 = this.getCoordinates(endNode);
-            let distX = Math.abs(coord1[1] - coord2[1]);
-            let distY = Math.abs(coord1[0] - coord2[0]);
-            return distX + distY;
-        }
-
-        getCoordinates(node) {
-            let coord = node.split('_');
-            coord[0] = parseInt(coord[0]);
-            coord[1] = parseInt(coord[1]);
-            return coord;
-        }
-
-        makePath(previous, end) {
-            let arr = [], next = end;
-
-            while (next !== null) {
-                arr.push(next);
-                next = previous[next];
-            }
-
-            for (let i = 0; i < Math.floor(arr.length / 2); i++) {
-                [arr[i], arr[arr.length - i - 1]] = [arr[arr.length - i - 1], arr[i]];
-            }
-
-            totalNodesVisited = arr.length;
-
-            return arr;
-        }
-    }
-
-
-
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    class SNode {
-        constructor(val) {
-            this.val = val;
-            this.next = null;
-        }
-    }
-
-    class Stack {
-        constructor() {
-            this.first = null;
-            this.last = null;
-            this.size = 0;
-        }
-
-        push(val) {
-            let node = new SNode(val);
-            this.size === 0 ? this.last = node : node.next = this.first;
-            this.first = node;
-            this.size++;
-            return this;
-        }
-
-        pop() {
-            if (this.size === 0) return undefined;
-            let oldFirst = this.first;
-            this.first = oldFirst.next;
-            oldFirst.next = null;
-            this.size--;
-            if (this.size === 0) this.last = null;
-            return oldFirst.val;
-        }
-    }
-
-    class QNode {
-        constructor(val) {
-            this.val = val;
-            this.next = null;
-        }
-    }
-
-    class Queue {
-        constructor() {
-            this.first = null;
-            this.last = null;
-            this.size = 0;
-        }
-
-        enqueue(val) {
-            let node = new QNode(val);
-            this.size === 0 ? this.first = node : this.last.next = node;
-            this.last = node;
-            this.size++;
-            return this;
-        }
-
-        dequeue() {
-            if (this.size === 0) return undefined;
-            let oldFirst = this.first;
-            this.first = oldFirst.next;
-            oldFirst.next = null;
-            this.size--;
-            if (this.size === 0) this.last = null;
-            return oldFirst.val;
-        }
-    }
-
-    class UnweightedGraph {
-        constructor() {
-            this.adjacencyList = {};
-        }
-
-        addVertex(vertex) {
-            if (!this.adjacencyList[vertex]) {
-                this.adjacencyList[vertex] = [];
-            }
-        }
-
-        addEdge(vertex1, vertex2) {
-            if (this.adjacencyList[vertex1] && this.adjacencyList[vertex2] &&
-                !this.adjacencyList[vertex1].includes(vertex2) && !this.adjacencyList[vertex2].includes(vertex1)) {
-                this.adjacencyList[vertex1].push(vertex2);
-                this.adjacencyList[vertex2].push(vertex1);
-            }
-        }
-
-        removeEdge(vertex1, vertex2) {
-            if (this.adjacencyList[vertex1] && this.adjacencyList[vertex2] &&
-                this.adjacencyList[vertex1].includes(vertex2) && this.adjacencyList[vertex2].includes(vertex1)) {
-                this.adjacencyList[vertex1] = this.adjacencyList[vertex1].filter(vtx => vtx !== vertex2);
-                this.adjacencyList[vertex2] = this.adjacencyList[vertex2].filter(vtx => vtx !== vertex1);
-            }
-        }
-
-        removeVertex(vertex) {
-            if (this.adjacencyList[vertex]) {
-                for (let vtx of this.adjacencyList[vertex]) {
-                    this.removeEdge(vertex, vtx);
-                }
-                delete this.adjacencyList[vertex];
-            }
-        }
-
-        async bfs(start, end, ignorePause) {
-            let arr = [],
-                visited = {},
-                queue = new Queue();
-
-            queue.enqueue(start);
-            visited[start] = true;
-
-            while (queue.size > 0) {
-                let next = queue.dequeue();
-                arr.push(next);
-
-                if (next != startNode && next != endNode) {
-                    if (!ignorePause) await pause(speed);
-                    document.getElementById(next).classList.add('visited');
-                }
-
-                if (next == end) break;
-                for (let vtx of this.adjacencyList[next]) {
-                    if (!visited[vtx]) {
-                        visited[vtx] = true;
-                        queue.enqueue(vtx);
-                    }
-                }
-            }
-
-            pathSearchFinished = true;
-            totalNodesVisited = arr.length;
-            return arr;
-        }
-
-        async dfsIterative(start, end, ignorePause) {
-            let arr = [],
-                visited = {},
-                stack = new Stack(),
-                next;
-
-            stack.push(start);
-            visited[start] = true;
-            while (stack.size > 0) {
-                next = stack.pop();
-                arr.push(next);
-
-                if (next != startNode && next != endNode) {
-                    if (!ignorePause) await pause(speed);
-                    document.getElementById(next).classList.add('visited');
-                }
-
-                if (next == end) break;
-                for (let v of this.adjacencyList[next]) {
-                    if (!visited[v]) {
-                        stack.push(v);
-                        visited[v] = true;
-                    }
-                }
-            }
-
-            pathSearchFinished = true;
-            totalNodesVisited = arr.length;
-            return arr;
-        }
-
-        async dfsRecursive(start, end, ignorePause) {
-            let arr = [],
-                visited = {},
-                found = false;
-
-            async function dfs(vtx, adjList) {
-                if (!vtx) return;
-                arr.push(vtx);
-                visited[vtx] = true;
-
-                if (vtx != startNode && vtx != endNode) {
-                    if (!ignorePause) await pause(speed);
-                    document.getElementById(vtx).classList.add('visited');
-                }
-
-                if (vtx == end) found = true;
-
-                for (let i = 0; i < adjList[vtx].length; i++) {
-                    let v = adjList[vtx][i];
-                    if (!(v in visited) && !found) await dfs(v, adjList);
-                }
-            }
-            await dfs(start, this.adjacencyList);
-
-            pathSearchFinished = true;
-            totalNodesVisited = arr.length;
-            return arr;
-        }
-
-        getCoordinates(node) {
-            let coord = node.split('_');
-            coord[0] = parseInt(coord[0]);
-            coord[1] = parseInt(coord[1]);
-            return coord;
-        }
-    }
-
-
-
-
-    // Mazes ======================================================================
-    async function generateRecursiveDivisionMaze(start = "0_0") {
-        let visited = {},
-            stack = new Stack(),
-            curr = start, idx, next, neighbors,
-            coord = weightedGraph.getCoordinates(start),
-            currElem = document.getElementById(start);
-
-        currObstacle = getSelectedRadioValue("obstacle");
-
-        // put walls
-        putObstacles();
-
-        visited[curr] = true;
-
-        while (true) {
-            let unvisited = [];
-
-            neighbors = getAllMazeNeighbors(curr);
-            for (let v of neighbors) {
-                if (!visited[v.val]) {
-                    unvisited.push(v);
-                }
-            }
-
-            idx = Math.floor(Math.random() * unvisited.length);
-            next = unvisited[idx];
-
-            if (next != undefined) {
-                visited[next.val] = true;
-
-                stack.push(curr);
-
-                coord = weightedGraph.getCoordinates(next.val);
-
-                if (next.dir == 'up') coord[0]++;
-                else if (next.dir == 'down') coord[0]--;
-                else if (next.dir == 'left') coord[1]++;
-                else if (next.dir == 'right') coord[1]--;
-
-                currElem = document.getElementById(`${coord[0]}_${coord[1]}`);
-
+        for (let i = arr.length; i > 1; i--) {
+            swapped = false;
+            for (let j = 1; j < i; j++) {
                 await pause(speed);
-                currElem.classList.remove(currObstacle);
-                currArr[coord[0]][coord[1]] = currElem;
-
-                curr = next.val;
-            }
-            else if (stack.size > 0) {
-                curr = stack.pop();
-            }
-            else break;
-        }
-    }
-
-    async function generateBinaryMaze(start = "0_0") {
-        let idx, next, neighbors, availNodes = [],
-            coord = weightedGraph.getCoordinates(start),
-            currElem = document.getElementById(start);
-
-        currObstacle = getSelectedRadioValue("obstacle");
-
-        // put walls
-        putObstacles();
-
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                if (currArr[row][col] != null && !currArr[row][col].classList.contains('weight')) {
-                    availNodes.push(currArr[row][col]);
+                arr[j - 1].classList = 'curr';
+                arr[j].classList = 'curr';
+                if (getRectValue(arr[j - 1]) > getRectValue(arr[j])) {
+                    await swap(arr, j - 1, j);
+                    swapped = true;
                 }
+                await pause(speed);
+                arr[j - 1].classList = '';
+
+                comparisons++;
+                updateNumbers();
             }
+            arr[i - 1].classList = 'sorted';
+            if (!swapped) break;
         }
 
-        for (let node of availNodes) {
-            neighbors = getRightDownMazeNeighbors(node.getAttribute('id'));
+        arr.forEach(r => r.classList = 'sorted');
+        await pause(speed);
+        arr.forEach(r => r.classList = '');
 
-            idx = Math.floor(Math.random() * neighbors.length);
-            next = neighbors[idx];
+        return arr;
+    }
 
-            if (next != undefined) {
-                coord = weightedGraph.getCoordinates(next.val);
+    async function swap(arr, i, j, swapClassLists = true) {
+        arrayAccesses += 2;
 
-                if (next.dir == 'down') coord[0]--;
-                else if (next.dir == 'right') coord[1]--;
+        await pause(speed);
 
-                currElem = document.getElementById(`${coord[0]}_${coord[1]}`);
+        let tempVal = getRectValue(arr[i]);
+        arr[i].setAttribute('val', getRectValue(arr[j]));
+        arr[j].setAttribute('val', tempVal);
 
-                await pause(speed);
-                currElem.classList.remove(currObstacle);
-                currArr[coord[0]][coord[1]] = currElem;
-            }
+        let tempY = arr[i].getAttribute('y');
+        arr[i].setAttribute('y', arr[j].getAttribute('y'));
+        arr[j].setAttribute('y', tempY);
+
+        let tempHeight = arr[i].getAttribute('height');
+        arr[i].setAttribute('height', arr[j].getAttribute('height'));
+        arr[j].setAttribute('height', tempHeight);
+
+        if (swapClassLists) {
+            let classList1 = "", classList2 = "";
+            arr[i].classList.forEach(e => classList1 += e);
+            arr[j].classList.forEach(e => classList2 += e);
+            arr[i].classList = classList2
+            arr[j].classList = classList1;
+        }
+
+        if (textModeEnabled) {
+            let text1 = arr[i].parentNode.querySelector('text');
+            let text2 = arr[j].parentNode.querySelector('text');
+            let tempText = text1.innerHTML;
+            text1.innerHTML = text2.innerHTML;
+            text2.innerHTML = tempText;
         }
     }
 
-    async function generateRandomMaze() {
-        let currSet = [], idx, coord, currElem;
+    // SELECTION SORT ==========================================================================================================
+    async function selectionSort(arr) {
+        let minIdx = 0,
+            prev = null;
 
-        currObstacle = getSelectedRadioValue("obstacle");
 
-        // put walls
-        for (let row = 0; row < rowCount; row++) {
-            for (let col = 0; col < colCount; col++) {
-                currSet.push(currArr[row][col].getAttribute('id'));
-                if (currSet.length % RANDOM_MAZE_FREQUENCY == 0 || col == colCount - 1) {
-                    idx = Math.floor(Math.random() * currSet.length);
-                    coord = weightedGraph.getCoordinates(currSet[idx]);
-                    currElem = document.getElementById(currSet[idx]);
+        for (let i = 0; i < arr.length - 1; i++) {
+            await pause(speed);
+            minIdx = i;
+            arr[minIdx].classList = 'min'; // track min
 
+            for (let j = i + 1; j < arr.length; j++) {
+                await pause(speed);
+                if (prev != null) resetColorSelectionSort(prev, currArr, minIdx);
+                arr[j].classList = 'curr'; // make current
+
+                if (getRectValue(arr[j]) < getRectValue(arr[minIdx])) {
                     await pause(speed);
-                    if (currObstacle == 'wall') {
-                        currArr[coord[0]][coord[1]] = null;
-                    }
-                    else if (currObstacle == 'weight') {
-                        currArr[coord[0]][coord[1]] = document.getElementById(`${coord[0]}_${coord[1]}`);
-                    }
-
-                    currElem.classList = currObstacle; // applied to all obstacle types
-
-                    currSet = [];
+                    arr[minIdx].classList = '';
+                    minIdx = j;
+                    arr[minIdx].classList = 'min'; // track min
                 }
+
+                prev = arr[j];
+
+                comparisons++;
+                updateNumbers();
             }
+
+            await pause(speed);
+            if (prev != null) resetColorSelectionSort(prev, currArr, minIdx);
+
+            if (i != minIdx) {
+                arr[i].classList = 'min';
+                await swap(arr, i, minIdx);
+                arr[i].classList = '';
+                arr[minIdx].classList = '';
+
+                updateNumbers();
+            }
+
+            arr[i].classList = 'sorted'; // make sorted
+        }
+
+        arr[arr.length - 1].classList = 'sorted';
+        await pause(speed);
+        arr.forEach(r => r.classList = '');
+
+        return arr;
+    }
+
+    function resetColorSelectionSort(rect, currArr, minIdx) {
+        if (rect == currArr[minIdx]) {
+            rect.classList = 'min';
+        }
+        else {
+            rect.classList = '';
         }
     }
 
-    function getAllMazeNeighbors(node) {
-        let coord = weightedGraph.getCoordinates(node);
-        let currRow = coord[0];
-        let currCol = coord[1];
-        let adjacentNodes = [];
+    // INSERTION SORT ==========================================================================================================
+    async function insertionSort(arr) {
+        arr[0].classList = 'sorted';
 
-        if (currRow > 1 && currArr[currRow - 2][currCol] != null) adjacentNodes.push({ val: currArr[currRow - 2][currCol].getAttribute('id'), dir: 'up' });
-        if (currRow < rowCount - 2 && currArr[currRow + 2][currCol] != null) adjacentNodes.push({ val: currArr[currRow + 2][currCol].getAttribute('id'), dir: 'down' });
-        if (currCol > 1 && currArr[currRow][currCol - 2] != null) adjacentNodes.push({ val: currArr[currRow][currCol - 2].getAttribute('id'), dir: 'left' });
-        if (currCol < colCount - 2 && currArr[currRow][currCol + 2] != null) adjacentNodes.push({ val: currArr[currRow][currCol + 2].getAttribute('id'), dir: 'right' });
+        for (let i = 1; i < arr.length; i++) {
+            await pause(speed);
+            arr[i].classList = 'next'; // make next
 
-        return adjacentNodes;
-    }
+            for (let j = i - 1; j >= 0; j--) {
+                await pause(speed);
+                arr[j].classList = 'curr'; // make current
 
-
-
-    function getRightDownMazeNeighbors(node) {
-        let coord = weightedGraph.getCoordinates(node);
-        let currRow = coord[0];
-        let currCol = coord[1];
-        let adjacentNodes = [];
-
-        if (currRow < rowCount - 2 && currArr[currRow + 2][currCol] != null) adjacentNodes.push({ val: currArr[currRow + 2][currCol].getAttribute('id'), dir: 'down' });
-        if (currCol < colCount - 2 && currArr[currRow][currCol + 2] != null) adjacentNodes.push({ val: currArr[currRow][currCol + 2].getAttribute('id'), dir: 'right' });
-
-        return adjacentNodes;
-    }
-
-    function putObstacles() {
-        for (let row = 0; row < rowCount; row++) {
-            if (row % 2 == 0) {
-                for (let col = 0; col < colCount; col++) {
-                    if (col % 2 == 1) {
-                        adjustNode(row, col);
+                if (getRectValue(arr[j]) > getRectValue(arr[j + 1])) {
+                    await swap(arr, j, j + 1);
+                    // arr[j].classList = 'next';
+                    // arr[j + 1].classList = 'curr';
+                    await pause(speed);
+                    arr[j + 1].classList = 'sorted';
+                    if (j === 0) {
+                        // await pause(speed);
+                        arr[j].classList = 'sorted'; // make sorted
                     }
+                } else {
+                    await pause(speed);
+                    arr[j].classList = 'sorted'; // make sorted
+                    arr[j + 1].classList = 'sorted'; // make sorted
+                    break;
                 }
+
+                comparisons++;
+                updateNumbers();
+            }
+        }
+
+        await pause(speed);
+        arr.forEach(r => r.classList = '');
+
+        return arr;
+    }
+
+
+    // MERGE SORT ==============================================================================================================
+    async function mergeSort(arr, startIdx = 0) {
+        let middle = Math.floor(arr.length / 2);
+        if (middle == 0) return arr;
+
+        let left = await mergeSort(arr.slice(0, middle), startIdx);
+        let right = await mergeSort(arr.slice(middle), startIdx + middle);
+
+        return await merge(left, right, startIdx);
+    }
+
+    async function merge(arr1, arr2, startIdx) {
+        let arr = [], vals = [],
+            prev = null,
+            i = 0, j = 0,
+            middleIdx = startIdx + arr1.length,
+            endIdx = startIdx + arr1.length + arr2.length - 1;
+
+        await pause(speed);
+        currArr[startIdx].classList = 'sorted'; // select the current one
+        currArr[middleIdx].classList = 'curr'; // select the current one
+        currArr[endIdx].classList = 'sorted'; // select the current one
+
+
+        while (i < arr1.length && j < arr2.length) {
+            await pause(speed);
+            if (prev != null) resetColorMergeSort(prev, currArr, startIdx, endIdx, middleIdx); // de-select old one
+            if (getRectValue(arr1[i]) <= getRectValue(arr2[j])) {
+                arr1[i].classList = 'next'; // select the current one
+                arr.push(arr1[i]);
+
+                prev = arr1[i];
+                i++;
             }
             else {
-                for (let col = 0; col < colCount; col++) {
-                    adjustNode(row, col);
-                }
+                arr2[j].classList = 'next'; // select the current one
+                arr.push(arr2[j]);
+
+                prev = arr2[j];
+                j++;
             }
+
+            comparisons++;
+            updateNumbers();
+        }
+
+        while (i < arr1.length) {
+            await pause(speed);
+            if (prev != null) resetColorMergeSort(prev, currArr, startIdx, endIdx, middleIdx); // de-select old one
+            // arr1[i == 0 ? i : i - 1].classList = ''; // de-select old one
+            arr1[i].classList = 'next'; // select the current one
+            arr.push(arr1[i]);
+
+            prev = arr1[i];
+            i++;
+        }
+
+        while (j < arr2.length) {
+            await pause(speed);
+            if (prev != null) resetColorMergeSort(prev, currArr, startIdx, endIdx, middleIdx); // de-select old one
+            // arr2[j == 0 ? j : j - 1].classList = ''; // de-select old one
+            arr2[j].classList = 'next'; // select the current one
+            arr.push(arr2[j]);
+
+            prev = arr2[j];
+            j++;
+        }
+
+        arr.forEach(e => vals.push(getRectValue(e)));
+
+        for (let a = startIdx; a < arr.length + startIdx; a++) {
+            await pause(speed);
+            let idx = a - startIdx;
+
+            if (prev != null) resetColorMergeSort(prev, currArr, startIdx, endIdx, middleIdx); // de-select old one
+
+            let newHeight = yScale(vals[idx]);
+            currArr[a].setAttribute('height', newHeight);
+            currArr[a].setAttribute('y', height - newHeight);
+            currArr[a].setAttribute('val', vals[idx]);
+            currArr[a].parentNode.querySelector('text').innerHTML = vals[idx];
+            arr[idx] = currArr[a];
+            currArr[a].classList = 'next'; // select the current one
+
+            prev = currArr[a];
+
+            arrayAccesses++;
+            updateNumbers();
+        }
+
+        await pause(speed);
+        currArr[startIdx].classList = ''; // select the current one
+        currArr[middleIdx].classList = ''; // select the current one
+        currArr[endIdx].classList = ''; // select the current one
+
+
+        return arr;
+    }
+
+    function resetColorMergeSort(rect, currArr, startIdx, endIdx, middleIdx) {
+        if (rect == currArr[startIdx] || rect == currArr[endIdx]) {
+            rect.classList = 'sorted';
+        }
+        else if (rect == currArr[middleIdx]) {
+            rect.classList = 'curr';
+        }
+        else {
+            rect.classList = '';
         }
     }
 
-    function adjustNode(row, col) {
-        document.getElementById(`${row}_${col}`).classList = currObstacle; // applied to all obstacle types
+    // QUICK SORT ==============================================================================================================
+    async function quickSort(arr, start = 0, end = arr.length - 1) {
+        if (start >= end) return arr;
 
-        if (currObstacle == 'wall') {
-            currArr[row][col] = null;
+        let pivotIdx = await placePivot(arr, start, end);
+        await quickSort(arr, start, pivotIdx - 1);
+        await quickSort(arr, pivotIdx + 1, end);
+
+        if (start == 0 && end == arr.length - 1) {
+            arr.forEach(r => r.classList = 'sorted');
+            await pause(speed);
+            arr.forEach(r => r.classList = '');
         }
-        else if (currObstacle == 'weight') {
-            currArr[row][col] = document.getElementById(`${row}_${col}`);
+    }
+
+    async function placePivot(arr, start = 0, end = arr.length - 1) {
+        arr[start].classList.add('edge');
+        arr[end].classList.add('edge');
+
+        let pivotIdx = start, prev;
+        for (let i = start + 1; i <= end; i++) {
+            await pause(speed);
+            arr[i].classList.add('curr');
+            if (prev != null) prev.classList.remove('curr');
+            prev = arr[i];
+            if (getRectValue(arr[start]) > getRectValue(arr[i])) {
+                pivotIdx++;
+                // await pause(speed);
+                // arr[i].classList.add('pivot');
+                // arr[pivotIdx].classList.remove('pivot');
+                await swap(arr, pivotIdx, i, false);
+            }
+
+            comparisons++;
+            updateNumbers();
         }
+        await pause(speed);
+        arr[start].classList.remove('edge');
+        arr[end].classList.remove('edge');
+        arr[end].classList.remove('curr');
+
+        await pause(speed);
+        arr[start].classList.add('pivot');
+        arr[pivotIdx].classList.add('pivot');
+        await swap(arr, start, pivotIdx, false);
+
+        await pause(speed);
+        arr[start].classList.remove('pivot');
+        arr[pivotIdx].classList = 'sorted';
+        return pivotIdx;
+    }
+
+    // RADIX SORT ==============================================================================================================
+    async function radixSort(arr) {
+        let vals, max, prev, idxs;
+
+        vals = [];
+        arr.forEach(r => vals.push(getRectValue(r)));
+
+        max = maxDigitCount(vals);
+        prev = null;
+
+        for (let i = 0; i < max; i++) {
+            let buckets = Array.from({ length: 10 }, () => []);
+            for (let j = 0; j < arr.length; j++) {
+                let num = getRectValue(arr[j]);
+                buckets[getDigit(num, i)].push(arr[j]);
+
+                await pause(speed);
+                if (prev != null) prev.classList = '';
+                arr[j].classList = 'curr'; // select the current one
+
+                prev = arr[j];
+            }
+
+            idxs = [];
+            buckets.forEach(e => {
+                if (e.length > 0) {
+                    idxs.length == 0 ? idxs.push(e.length - 1) : idxs.push(idxs[idxs.length - 1] + e.length);
+                }
+            });
+
+            arr = [].concat(...buckets);
+
+            vals = [];
+            arr.forEach(e => vals.push(getRectValue(e)));
+
+            for (let a = 0; a < arr.length; a++) {
+                await pause(speed);
+                if (prev != null) prev.classList.remove('curr');
+
+                let newHeight = yScale(vals[a]);
+                currArr[a].setAttribute('height', newHeight);
+                currArr[a].setAttribute('y', height - newHeight);
+                currArr[a].setAttribute('val', vals[a]);
+                currArr[a].parentNode.querySelector('text').innerHTML = vals[a];
+                currArr[a].classList.add('curr'); // select the current one
+                if (idxs.includes(a)) currArr[a].classList.add('edge'); // includes(a) is always O(1) since idxs.length max value is 10
+
+                arr[a] = currArr[a];
+
+                prev = currArr[a];
+
+                arrayAccesses++;
+                updateNumbers();
+            }
+        }
+
+        arr.forEach(r => r.classList = 'sorted');
+        await pause(speed);
+        arr.forEach(r => r.classList = '');
+
+        return arr;
+    }
+
+    function getDigit(num, place) {
+        let mod = 10 ** place;
+        return Math.floor(Math.abs(num) / mod) % 10;
+    }
+
+    function digitCount(num) {
+        return Math.abs(num).toString().length;
+    }
+
+    function maxDigitCount(nums) {
+        let max = 0;
+        for (let i = 0; i < nums.length; i++) {
+            max = Math.max(max, digitCount(nums[i]));
+        }
+        return max;
+    }
+
+    // HEAP SORT ===============================================================================================================
+    async function heapSort(arr) {
+        let n = arr.length;
+        let a = Math.floor(n / 2) - 1; // idx of the first element with children
+        let bound = 1;
+        let currClass = 'edge';
+
+        for (let i = 0; i < arr.length; i++) {
+            arr[i].classList = currClass;
+            if (i + 1 == bound) {
+                bound *= 2;
+                currClass = currClass == '' ? 'edge' : '';
+            }
+        }
+
+        // build heap
+        for (let i = a; i >= 0; i--) {
+            await heapify(arr, n, i);
+        }
+
+        // extract elements from heap
+        for (let i = n - 1; i > 0; i--) {
+            await swap(arr, 0, i, false);
+            arr[i].classList = 'sorted';
+
+            updateNumbers();
+
+            await heapify(arr, i, 0);
+        }
+
+        arr[0].classList = 'sorted';
+        await pause(speed);
+        arr.forEach(r => r.classList = '');
+    }
+
+    // i - root idx
+    async function heapify(arr, n, i) {
+        let maxIdx = i; // make max as a root
+        let leftIdx = 2 * i + 1;
+        let rightIdx = 2 * i + 2;
+
+        // If left child is larger than root
+        if (leftIdx < n && getRectValue(arr[leftIdx]) > getRectValue(arr[maxIdx])) {
+            maxIdx = leftIdx;
+        }
+
+        if (rightIdx < n && getRectValue(arr[rightIdx]) > getRectValue(arr[maxIdx])) {
+            maxIdx = rightIdx;
+        }
+
+        comparisons += 2
+
+        if (maxIdx != i) {
+            arr[maxIdx].classList.add('curr');
+            arr[i].classList.add('curr');
+            await swap(arr, i, maxIdx, false);
+            arr[maxIdx].classList.remove('curr');
+            arr[i].classList.remove('curr');
+
+            await heapify(arr, n, maxIdx); // heapify the whole subtree
+        }
+
+        updateNumbers();
     }
 });

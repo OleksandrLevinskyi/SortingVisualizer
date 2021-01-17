@@ -7,6 +7,25 @@
     /* font-size: .9rem; */
 }
 
+svg {
+    display: block;
+    background-color: grey;
+    width: 100%;
+    margin: 0 auto 10px;
+}
+
+.curr {
+    fill: red;
+}
+
+.edge {
+    fill: green;
+}
+
+.middle {
+    fill: blue;
+}
+
 body {
     position: relative;
     width: 100%;
@@ -14,23 +33,48 @@ body {
 }
 
 .night_mode {
-    background-color: #1e1e1e;
+    background-color: #333;
     color: white;
 }
 
-svg {
-    margin: 0 auto 10px;
-    display: block;
-    background-color: grey;
-    width: 100%;
-}
-
 rect {
-    fill: white;
+    fill: blue;
     stroke: black;
 }
 
-rect.wall {
+rect.sorted {
+    fill: orange;
+}
+
+rect.edge {
+    fill: purple;
+}
+
+rect.pivot {
+    fill: pink;
+}
+
+rect.curr {
+    fill: green;
+}
+
+rect.min {
+    fill: red;
+}
+
+rect.next {
+    fill: red;
+}
+
+text {
+    fill: white;
+}
+
+.hidden {
+    display: none;
+}
+
+/* rect.wall {
     fill: #0c3547;
 }
 
@@ -64,4 +108,4 @@ rect.end, rect.path.weight.end, rect.visited.weight.end {
 
 rect.draggable {
     fill: rgba(255, 255, 255, 0);
-}
+} */

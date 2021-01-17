@@ -8,7 +8,8 @@ li {
     display: inline-block;
 }
 
-input.special[type="radio"][id^="obstacle"], input.special[type="radio"][id^="mode"] {
+input.special[type="radio"][id^="text"],
+input.special[type="radio"][id^="mode"] {
     display: none;
 }
 
@@ -63,14 +64,15 @@ label.special img {
     z-index: -1;
 }
 
-/* other */
 
+/* other */
 hr {
     margin: 5px 0;
     background-color: grey;
 }
 
-input#dimension, input#delay {
+input#bar_count,
+input#delay {
     width: 90%;
 }
 
@@ -88,12 +90,19 @@ input#dimension, input#delay {
     margin-left: -.25rem;
 }
 
-button#launch, button#apply {
-    position: absolute;
-    bottom: -9%;
-    left: 50%;
+button#sort,
+button#apply {
+    margin: auto;
     width: 90%;
-    transform: translate(-50%, -50%);
+}
+
+#errors{
+    color: #ff0000;
+    font-size: .9rem;
+}
+
+button#generate {
+    height: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -109,10 +118,24 @@ p.heading {
 }
 
 span.data {
-    font-size: .9rem;
+    font-size: .7rem;
     font-weight: 100;
 }
 
-input, button {
+
+/* input, button {
     background-color: #0c3547;
+} */
+
+input#values {
+    /* font-size: 18px; */
+    padding: 5px 5px 5px 5px;
+    display: block;
+    width: 90%;
+    border: none;
+    border-bottom: 1px solid #757575;
+}
+
+input:focus {
+    outline: none;
 }

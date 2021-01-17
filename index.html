@@ -13,9 +13,9 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pathfinding Visualizations</title>
+    <title>Sort Visualizations</title>
 
-    <meta name="description" content="Pathfinding Visualizations">
+    <meta name="description" content="Sort Visualizations">
     <meta name="author" content="Oleksandr Levinskyi">
 
     <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
@@ -28,89 +28,73 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 not_padded">
-                <svg>
-                    <defs>
-                        <linearGradient id='gradient' x1='14.1%' y1='14.1%' x2='0' spreadMethod='repeat'>
-                            <stop stop-color='#fff' />
-                            <stop offset='.504' stop-color='#fff' />
-                            <stop offset='1' stop-color='#000' />
-                            <stop offset='1' stop-color='#000' />
-                        </linearGradient>
-                        <linearGradient id='gradient_visited' x1='14.1%' y1='14.1%' x2='0' spreadMethod='repeat'>
-                            <stop stop-color='#c572ff' />
-                            <stop offset='.504' stop-color='#c572ff' />
-                            <stop offset='.504' stop-color='#000' />
-                            <stop offset='1' stop-color='#000' />
-                        </linearGradient>
-                        <linearGradient id='gradient_path' x1='14.1%' y1='14.1%' x2='0' spreadMethod='repeat'>
-                            <stop stop-color='#fffe6a' />
-                            <stop offset='.504' stop-color='#fffe6a' />
-                            <stop offset='.504' stop-color='#000' />
-                            <stop offset='1' stop-color='#000' />
-                        </linearGradient>
-                    </defs>
-                </svg>
+                <svg></svg>
             </div>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <p class="heading text-center">Algorithms</p>
+                <p class="heading text-center">Sorting Algorithm</p>
                 <div class="row">
                     <div class="col-md-6 left_padded">
-                        <h6>Find Path</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="algo" id="dijkstras" value="dijkstras"
-                                checked>
-                            <label class="form-check-label" for="dijkstras">Dijkstra's</label>
+                            <input class="form-check-input" type="radio" name="sort" id="bubble_sort"
+                                value="bubble_sort" checked>
+                            <label class="form-check-label" for="bubble_sort">Bubble Sort</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="algo" id="a_star" value="a_star">
-                            <label class="form-check-label" for="a_star">A*</label>
+                            <input class="form-check-input" type="radio" name="sort" id="selection_sort"
+                                value="selection_sort">
+                            <label class="form-check-label" for="selection_sort">Selection Sort</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sort" id="insertion_sort"
+                                value="insertion_sort">
+                            <label class="form-check-label" for="insertion_sort">Insertion Sort</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sort" id="radix_sort" value="radix_sort">
+                            <label class="form-check-label" for="radix_sort">Radix Sort</label>
                         </div>
                     </div>
                     <div class="col-md-6 left_padded">
-                        <h6>Check if Reachable</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="algo" id="bfs" value="bfs">
-                            <label class="form-check-label" for="bfs">BFS</label>
+                            <input class="form-check-input" type="radio" name="sort" id="merge_sort" value="merge_sort">
+                            <label class="form-check-label" for="merge_sort">Merge Sort</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="algo" id="dfs_iterative"
-                                value="dfs_iterative">
-                            <label class="form-check-label" for="dfs_iterative">DFS (Iterative)</label>
+                            <input class="form-check-input" type="radio" name="sort" id="quick_sort" value="quick_sort">
+                            <label class="form-check-label" for="quick_sort">Quick Sort</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="algo" id="dfs_recursive"
-                                value="dfs_recursive">
-                            <label class="form-check-label" for="dfs_recursive">DFS (Recursive)</label>
+                            <input class="form-check-input" type="radio" name="sort" id="heap_sort" value="heap_sort">
+                            <label class="form-check-label" for="heap_sort">Heap Sort</label>
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary btn-md" id="launch">Launch</button>
+                <button type="button" class="btn btn-primary btn-md" id="sort">Sort</button>
             </div>
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-md-5">
                         <div class="row">
                             <div class="col-md-6 left_padded">
-                                <p class="heading">Obstacle Type</p>
+                                <p class="heading">Enable Text</p>
                             </div>
                             <div class="col-md-6 not_padded">
                                 <ul>
                                     <li>
                                         <div class="form-check">
-                                            <input class="form-check-input special" type="radio" name="obstacle"
-                                                id="obstacle_wall" value="wall" checked>
-                                            <label class="special" for="obstacle_wall"><img
-                                                    src="images/wall.png" /></label>
+                                            <input class="form-check-input special" type="radio" name="text"
+                                                id="text_true" value="true" checked>
+                                            <label class="special" for="text_true"><img src="images/text.png" /></label>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="form-check">
-                                            <input class="form-check-input special" type="radio" name="obstacle"
-                                                id="obstacle_weight" value="weight">
-                                            <label class="special" for="obstacle_weight"><img
-                                                    src="images/weight.png" /></label>
+                                            <input class="form-check-input special" type="radio" name="text"
+                                                id="text_false" value="false">
+                                            <label class="special" for="text_false"><img
+                                                    src="images/no_text.png" /></label>
                                         </div>
                                     </li>
                                 </ul>
@@ -144,65 +128,51 @@
                     </div>
                     <div class="col-md-2 not_padded">
                         <button type="button" class="btn btn-primary btn-block align-middle"
-                            id="clean">Clean<br>Field</button>
-                        <button type="button" class="btn btn-primary btn-block align-middle"
-                            id="reset">Reset<br>Field</button>
+                            id="generate">Generate<br />New<br />Array</button>
                     </div>
                     <div class="col-md-5 left_padded">
-                        <p class="heading">Grid Dimension <span class="data">(<span id="grid_dimension"></span>
-                                cells/row)</span></p>
-                        <input type="range" class="form-range" min="15" max="101" step="2" id="dimension">
+                        <p class="heading">Bar Count <span class="data">(<span id="count"></span>
+                                bars)</span></p>
+                        <input type="range" min="10" max="45" step="1" id="bar_count">
 
                         <p class="heading">Animation Delay <span class="data">(<span id="animation_delay"></span>
                                 ms)</span></p>
-                        <input type="range" min="10" max="500" step="10" id="delay">
+                        <input type="range" min="5" max="500" step="5" id="delay">
                     </div>
                 </div>
 
                 <hr />
                 <!-- <p class="heading text-center not_padded">Report</p> -->
 
-                <p class="text-center not_padded" id="description"><b>Choose Algorithm/Maze To Animate</b></p>
+                <p class="text-center not_padded" id="description"><b>Choose Algorithm To Animate</b></p>
                 <div class="row">
                     <div class="col-md-6">
                         <p class="text-center not_padded">
-                            <span id="cost"></span>
+                            <u>Comparisons: <span id="comparisons">N/A</span></u>
                         </p>
                     </div>
                     <div class="col-md-6">
                         <p class="text-center not_padded">
-                            <span id="nodes_visited"></span>
+                            <u>Array Manipulations: <span id="array_manipulations">N/A</span></u> <span class="data">(swap/change values)</span>
                         </p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <p class="heading text-center">Mazes</p>
+                <p class="heading text-center">Create Custom Array</p>
                 <div class="row">
                     <div class="col-md-12 left_padded">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="maze" id="recursive_division"
-                                value="recursive_division" checked>
-                            <label class="form-check-label" for="recursive_division">Recursive
-                                Division</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="maze" id="binary" value="binary">
-                            <label class="form-check-label" for="binary">Binary Maze</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="maze" id="random" value="random">
-                            <label class="form-check-label" for="random">Random Obstacles</label>
-                        </div>
+                        <input type="text" id="values" placeholder="Enter space separated integers">
+                        <div id="errors"></div>
                     </div>
+                    <button type="button" class="btn btn-primary" id="apply">Apply</button>
                 </div>
-                <button type="button" class="btn btn-primary" id="apply">Apply</button>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <hr />
-                <p class="text-center">&copy; Oleksandr Levinskyi (2021)</p>
+                <p class="text-center">&copy; 2021 Oleksandr Levinskyi - Sorting Visualizer</p>
             </div>
         </div>
     </div>
@@ -210,6 +180,7 @@
     <script src="js/libraries/jquery.min.js"></script>
     <script src="js/libraries/bootstrap.min.js"></script>
 
+    <script src="https://d3js.org/d3.v4.js"></script>
     <script src="js/app.js"></script>
     <!-- <script src="js/main.js"></script>
     <script src="js/bundle.js"></script> -->
