@@ -321,11 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
-
-
-
     // SORTING ALGORITHMS ========================================================================================================================================================================================================================== 
     // BUBBLE SORT =============================================================================================================
     async function bubbleSort(arr) {
@@ -392,6 +387,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+
+
+
     // SELECTION SORT ==========================================================================================================
     async function selectionSort(arr) {
         let minIdx = 0,
@@ -452,6 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+
+
+
     // INSERTION SORT ==========================================================================================================
     async function insertionSort(arr) {
         arr[0].classList = 'sorted';
@@ -491,6 +494,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return arr;
     }
+
+
+
 
 
     // MERGE SORT ==============================================================================================================
@@ -604,6 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+
+
+
     // QUICK SORT ==============================================================================================================
     async function quickSort(arr, start = 0, end = arr.length - 1) {
         if (start >= end) return arr;
@@ -655,6 +665,10 @@ document.addEventListener('DOMContentLoaded', () => {
         arr[pivotIdx].classList = 'sorted';
         return pivotIdx;
     }
+
+
+
+
 
     // RADIX SORT ==============================================================================================================
     async function radixSort(arr) {
@@ -735,6 +749,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return max;
     }
+
+
+
+
 
     // HEAP SORT ===============================================================================================================
     async function heapSort(arr) {
