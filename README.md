@@ -3,19 +3,27 @@
 # Instructions
 Choose one out of 7 sorting algorithms.
 
-Enable/Disable text.
-Choose the day/night mode.
-Adjust bar count/animation delay.
+---
+
+* Enable/Disable text.
+* Choose the day/night mode.
+* Adjust bar count/animation delay.
+
+---
 
 After launching algorithm, you will see its description at the bottom of the page with:
 * Time/Space Complexities
 * Number of comparisons
 * Number of Array Manipulations (number of swaps/value changes)
 
+---
+
 You can create a custom array by entering space separated values (min 10 - max 50 elements).
 
-'Generate New Array' button - generates new array with random values
-'Sort' button - starts the alogrithm animation
+---
+
+* 'Generate New Array' button - generates new array with random values
+* 'Sort' button - starts the alogrithm animation
 
 # Try It
 You can access this app on: https://sorting-visualizations.herokuapp.com/ (please read the instructions above on how to use it)
