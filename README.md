@@ -1,34 +1,37 @@
-## Usage
+# SortingVisualizer
+It is an interactive application built for visualizing sorting algorithms to understand your understanding of them. There are implemented 7 algorithms: Heap, Quick, Merge, Radix, Intertion, Selection, and Bubble sorts.
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+# Instructions
+Choose one out of 7 sorting algorithms.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+---
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+* Enable/Disable text.
+* Choose the day/night mode.
+* Adjust bar count/animation delay.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+After launching algorithm, you will see its description at the bottom of the page with:
+* Time/Space Complexities
+* Number of comparisons
+* Number of Array Manipulations (number of swaps/value changes)
 
-### `npm dev` or `npm start`
+---
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+You can create a custom array by entering space separated values (min 10 - max 50 elements).
 
-The page will reload if you make edits.<br>
+---
 
-### `npm run build`
+* 'Generate New Array' button - generates new array with random values
+* 'Sort' button - starts the alogrithm animation
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+# Try It
+You can access this app on: https://sorting-visualizations.herokuapp.com/ (please read the instructions above on how to use it)
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+NOTE:
+* please launch this app in Chrome browser only
+* for the best experience, please use the monitor with at least 14" diagonal
 
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+Thank you for viewing Sorting Visualizer by Oleksandr Levinskyi!
