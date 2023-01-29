@@ -4,6 +4,7 @@ import TextTypeSelector from "./TextTypeSelector";
 import ColorModeSwitch from "./ColorModeSwitch";
 import Tutorial from "./Tutorial";
 import RangeSelector from "./RangeSelector";
+import CustomArrayInput from "./CustomArrayInput";
 
 const ControlPanel: Component = () => {
     return (
@@ -29,22 +30,12 @@ const ControlPanel: Component = () => {
                            min={5}
                            max={500}
                            step={5}/>
-            <div class="row">
-                <div class="col-md-3">
-                    <p class="heading text-center">Create Custom Array</p>
-                    <div class="row">
-                        <div class="col-md-12 left_padded">
-                            <input type="text" id="values" placeholder="Enter space separated integers"/>
-                            <div id="errors"></div>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="apply">Apply</button>
-                    </div>
-                </div>
-                <div class="col-md-1 d-flex flex-column justify-content-center align-items-end">
-                    <ColorModeSwitch/>
+            <CustomArrayInput/>
 
-                    <Tutorial/>
-                </div>
+            <div class="col-md-1 d-flex flex-column justify-content-center align-items-end">
+                <ColorModeSwitch/>
+
+                <Tutorial/>
             </div>
         </div>
     );
