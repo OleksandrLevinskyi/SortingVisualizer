@@ -1,41 +1,20 @@
 import type {Component} from 'solid-js';
 import Field from "./Field";
 import Dropdown from "./Dropdown";
+import TextTypeSelector from "./TextTypeSelector";
+import ColorModeSwitch from "./ColorModeSwitch";
+import Tutorial from "./Tutorial";
 
 const ControlPanel: Component = () => {
     return (
         <div class="container-fluid">
             <Field/>
+            <TextTypeSelector/>
             <div class="row">
                 <Dropdown/>
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-md-5">
-                            <div class="row">
-                                <div class="col-md-6 left_padded">
-                                    <p class="heading">Enable Text</p>
-                                </div>
-                                <div class="col-md-6 not_padded">
-                                    <ul>
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input special" type="radio" name="text"
-                                                       id="text_true" value="true" checked/>
-                                                <label class="special" for="text_true"><img
-                                                    src="images/text.png"/></label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input special" type="radio" name="text"
-                                                       id="text_false" value="false"/>
-                                                <label class="special" for="text_false"><img
-                                                    src="images/no_text.png"/></label>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-6 left_padded">
@@ -105,6 +84,11 @@ const ControlPanel: Component = () => {
                         </div>
                         <button type="button" class="btn btn-primary" id="apply">Apply</button>
                     </div>
+                </div>
+                <div class="col-md-1 d-flex flex-column justify-content-center align-items-end">
+                    <ColorModeSwitch/>
+
+                    <Tutorial/>
                 </div>
             </div>
             <div class="row">
