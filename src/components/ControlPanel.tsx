@@ -14,34 +14,6 @@ const ControlPanel: Component = () => {
                 <Dropdown/>
                 <div class="col-md-6">
                     <div class="row">
-                        <div class="col-md-5">
-
-                            <div class="row">
-                                <div class="col-md-6 left_padded">
-                                    <p class="heading">Mode</p>
-                                </div>
-                                <div class="col-md-6 not_padded">
-                                    <ul>
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input special" type="radio" name="mode"
-                                                       id="mode_day" value="day" checked/>
-                                                <label class="special" for="mode_day"><img
-                                                    src="images/sun.png"/></label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input special" type="radio" name="mode"
-                                                       id="mode_night" value="night"/>
-                                                <label class="special" for="mode_night"><img
-                                                    src="images/moon.png"/></label>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-md-2 not_padded">
                             <button type="button" class="btn btn-primary btn-block align-middle"
                                     id="generate">Generate<br/>New<br/>Array
