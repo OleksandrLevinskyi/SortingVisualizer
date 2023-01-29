@@ -1,14 +1,14 @@
 import type {Component} from 'solid-js';
 import ControlPanel from "./ControlPanel";
 
-const Grid: Component = () => {
+const Field: Component = () => {
     return (
         <div class="row">
-            <div class="col-md-12 p-0">
-                <div class="grid grid-columns"></div>
+            <div class="col-md-12 not_padded">
+                <svg></svg>
             </div>
         </div>
     );
 };
 
-export default Grid;
+export default Field;
