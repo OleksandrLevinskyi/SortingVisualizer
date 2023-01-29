@@ -30,7 +30,7 @@ You can create a custom array by entering space separated values (min 10 - max 5
 # Try It
 You can access this app on: https://sorting-visualizations.herokuapp.com/ (please read the instructions above on how to use it)
 
-NOTE: 
+NOTE:
 * please launch this app in Chrome browser only
 * for the best experience, please use the monitor with at least 14" diagonal
 
