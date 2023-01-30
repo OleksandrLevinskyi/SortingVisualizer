@@ -3,7 +3,8 @@ import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
 class MergeSort implements ISortStrategy {
-    async sort(arr: Array<number>, startIdx = 0): Promise<Array<number>> {
+    async sort(arr: Array<any>, startIdx = 0): Promise<Array<any>> {
+        const context: Context = Context.getContext();
         let middle = Math.floor(arr.length / 2);
         if (middle == 0) return arr;
 

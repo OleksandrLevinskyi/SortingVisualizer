@@ -3,7 +3,8 @@ import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
 class QuickSort implements ISortStrategy {
-    async sort(arr: Array<number>, start = 0, end = arr.length - 1) {
+    async sort(arr: Array<any>, start = 0, end = arr.length - 1): Promise<any> {
+        const context: Context = Context.getContext();
         if (start >= end) return arr;
 
         let pivotIdx = await placePivot(arr, start, end);

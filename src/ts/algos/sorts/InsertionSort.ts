@@ -1,42 +1,47 @@
 import {ISortStrategy} from "../ISortStrategy";
-import {pause} from "../../utils/utils";
+import {getRectValue, pause} from "../../utils/utils";
 import {Context} from "../../Context";
+import {swap} from "../../utils/sort_utils";
+import {updateNumbers} from "../../utils/panel_utils";
 
 class InsertionSort implements ISortStrategy {
-    async sort(arr: Array<number>): Promise<Array<number>> {
+    async sort(arr: Array<any>): Promise<Array<any>> {
+        const context: Context = Context.getContext();
+
         arr[0].classList = 'sorted';
 
         for (let i = 1; i < arr.length; i++) {
-            await pause(speed);
+            await pause(context.speed);
             arr[i].classList = 'next'; // make next
 
             for (let j = i - 1; j >= 0; j--) {
-                await pause(speed);
+                await pause(context.speed);
                 arr[j].classList = 'curr'; // make current
 
                 if (getRectValue(arr[j]) > getRectValue(arr[j + 1])) {
                     await swap(arr, j, j + 1);
-                    // arr[j].classList = 'next';
-                    // arr[j + 1].classList = 'curr';
-                    await pause(speed);
+                    await pause(context.speed);
+
                     arr[j + 1].classList = 'sorted';
+
                     if (j === 0) {
-                        // await pause(speed);
-                        arr[j].classList = 'sorted'; // make sorted
+                        arr[j].classList = 'sorted';
                     }
                 } else {
-                    await pause(speed);
-                    arr[j].classList = 'sorted'; // make sorted
-                    arr[j + 1].classList = 'sorted'; // make sorted
+                    await pause(context.speed);
+
+                    arr[j].classList = 'sorted';
+                    arr[j + 1].classList = 'sorted';
+
                     break;
                 }
 
-                comparisons++;
+                context.comparisons++;
                 updateNumbers();
             }
         }
 
-        await pause(speed);
+        await pause(context.speed);
         arr.forEach(r => r.classList = '');
 
         return arr;

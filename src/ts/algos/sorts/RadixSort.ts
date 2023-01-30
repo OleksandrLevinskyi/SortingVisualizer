@@ -3,7 +3,8 @@ import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
 class RadixSort implements ISortStrategy {
-    async sort(arr: Array<number>): Promise<Array<number>> {
+    async sort(arr: Array<any>): Promise<Array<any>> {
+        const context: Context = Context.getContext();
         let vals, max, prev, idxs;
 
         vals = [];
