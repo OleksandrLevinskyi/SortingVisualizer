@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => loadApp());
 export const loadApp = () => {
     const context: Context = Context.getContext();
 
-    document.getElementById('count')!.innerText = String(context.barCount);
+    document.getElementById('bar_count')!.innerText = String(context.barCount);
     document.getElementById('animation_delay')!.innerText = String(context.speed);
-    context.svg.attr('height', context.height);
+    context.svg.setAttribute('height', String(context.height));
 
     generateRandomArray();
     addEventHandlers();
@@ -38,11 +38,11 @@ function addEventHandlers() {
 
     document.getElementById('text_true')!.addEventListener('click', () => {
         context.textModeEnabled = true;
-        document.getElementById('bar_count')!.setAttribute('max', String(MAX_BAR_COUNT_WITH_TEXT));
+        document.getElementById('count')!.setAttribute('max', String(MAX_BAR_COUNT_WITH_TEXT));
 
         if (context.barCount > MAX_BAR_COUNT_WITH_TEXT) {
             context.barCount = MAX_BAR_COUNT_WITH_TEXT;
-            document.getElementById('bar_count')!.setAttribute('value', String(MAX_BAR_COUNT_WITH_TEXT));
+            document.getElementById('count')!.setAttribute('value', String(MAX_BAR_COUNT_WITH_TEXT));
 
             inputBarCount();
             changeBarCount();
@@ -53,7 +53,7 @@ function addEventHandlers() {
 
     document.getElementById('text_false')!.addEventListener('click', () => {
         context.textModeEnabled = false;
-        document.getElementById('bar_count')!.setAttribute('max', String(MAX_BAR_COUNT));
+        document.getElementById('count')!.setAttribute('max', String(MAX_BAR_COUNT));
 
         hideText();
     });
@@ -63,9 +63,9 @@ function addEventHandlers() {
         document.getElementById('animation_delay')!.innerText = String(context.speed);
     });
 
-    document.getElementById('bar_count')!.addEventListener("input", inputBarCount);
+    document.getElementById('count')!.addEventListener("input", inputBarCount);
 
-    document.getElementById('bar_count')!.addEventListener("change", changeBarCount);
+    document.getElementById('count')!.addEventListener("change", changeBarCount);
 
     document.getElementById('apply')!.addEventListener('click', generateCustomArray);
     document.getElementById('generate')!.addEventListener('click', generateRandomArray);

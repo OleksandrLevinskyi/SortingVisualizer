@@ -3,9 +3,9 @@ import {createCustomArray, createRandomArray, getSelectedRadioValue, pause} from
 import {DESCRIPTIONS, SORT_TYPES, TOP_PADDING} from "../constants";
 import * as d3 from "d3";
 
-const context: Context = Context.getContext();
-
 export async function sort() {
+    const context: Context = Context.getContext();
+
     context.currArr = Array.from(document.getElementsByTagName('rect'));
     let sortType = getSelectedRadioValue("sort");
 
@@ -20,9 +20,9 @@ export async function sort() {
     await SORT_TYPES[sortType].sort(context.currArr);
 
     if (sortType === 'merge_sort') {
-        context.currArr.forEach((r:any) => r.classList = 'sorted');
+        context.currArr.forEach((r: any) => r.classList = 'sorted');
         await pause(context.speed);
-        context.currArr.forEach((r:any)=> r.classList = '');
+        context.currArr.forEach((r: any) => r.classList = '');
     }
 
     updateNumbers();
@@ -40,6 +40,7 @@ export function findMaxVal(arr: Array<number>): number {
 }
 
 export function generateCustomArray() {
+    const context: Context = Context.getContext();
     let values = d3.select('#values').property('value').trim();
     let nums = values.split(' ');
     let error = false;
@@ -64,7 +65,7 @@ export function generateCustomArray() {
         let vals = createCustomArray(nums);
 
         context.barCount = vals.length;
-        document.getElementById('bar_count')!.setAttribute('value', String(context.barCount));
+        document.getElementById('count')!.setAttribute('value', String(context.barCount));
         inputBarCount();
         context.barWidth = (context.width + context.barPadding) / context.barCount - context.barPadding;
         draw(vals);
@@ -77,6 +78,7 @@ export function generateCustomArray() {
 }
 
 export function generateRandomArray() {
+    const context: Context = Context.getContext();
     let vals = createRandomArray();
     draw(vals);
 
@@ -85,7 +87,9 @@ export function generateRandomArray() {
 }
 
 export function draw(arr: Array<number>): void {
+    const context: Context = Context.getContext();
     context.maxVal = findMaxVal(arr);
+    context.svg = d3.select('svg');
 
     context.yScale = d3.scaleLinear()
         .domain([0, context.maxVal])
@@ -129,7 +133,7 @@ export function enableControls(enabled: boolean): void {
     document.getElementsByName('text').forEach((e: any) => e.disabled = !enabled);
 
     (document.getElementById('sort') as HTMLSelectElement)!.disabled = !enabled;
-    (document.getElementById('bar_count') as HTMLSelectElement)!.disabled = !enabled;
+    (document.getElementById('count') as HTMLSelectElement)!.disabled = !enabled;
     (document.getElementById('generate') as HTMLSelectElement)!.disabled = !enabled;
     (document.getElementById('apply') as HTMLSelectElement)!.disabled = !enabled;
 }
@@ -143,8 +147,9 @@ export function updateDisplayData(algorithmName: string | null = null, desc = ''
 }
 
 export function updateNumbers() {
-    document.getElementById('comparisons')!.innerHTML = context.comparisons > 0 ? `${context.comparisons}` : `N/A`;
+    const context: Context = Context.getContext();
 
+    document.getElementById('comparisons')!.innerHTML = context.comparisons > 0 ? `${context.comparisons}` : `N/A`;
     document.getElementById('array_manipulations')!.innerHTML = context.arrayAccesses > 0 ? `${context.arrayAccesses}` : `N/A`;
 }
 
@@ -165,11 +170,14 @@ export function showText() {
 }
 
 export function inputBarCount() {
-    context.barCount = parseInt((document.getElementById('bar_count') as HTMLSelectElement)!.value);
-    document.getElementById('count')!.innerText = String(context.barCount);
+    const context: Context = Context.getContext();
+
+    context.barCount = parseInt((document.getElementById('count') as HTMLSelectElement)!.value);
+    document.getElementById('bar_count')!.innerText = String(context.barCount);
 }
 
 export function changeBarCount() {
+    const context: Context = Context.getContext();
     const values: Array<number> = createRandomArray();
 
     context.barWidth = (context.width + context.barPadding) / context.barCount - context.barPadding;
