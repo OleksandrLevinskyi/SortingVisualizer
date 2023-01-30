@@ -1,44 +1,41 @@
+import {Context} from "../Context";
+import {createCustomArray, createRandomArray, getSelectedRadioValue, pause} from "./utils";
+import {DESCRIPTIONS, SORT_TYPES, TOP_PADDING} from "../constants";
+import * as d3 from "d3";
+
+const context: Context = Context.getContext();
+
 export async function sort() {
-    currArr = Array.from(document.getElementsByTagName('rect'));
-    // drop-down
+    context.currArr = Array.from(document.getElementsByTagName('rect'));
     let sortType = getSelectedRadioValue("sort");
 
-    comparisons = 0;
-    arrayAccesses = 0;
+    context.comparisons = 0;
+    context.arrayAccesses = 0;
 
     updateDisplayData(sortType);
     updateNumbers();
 
     enableControls(false);
 
-    if (sortType === 'bubble_sort') {
-        await bubbleSort(currArr);
-    } else if (sortType === 'selection_sort') {
-        await selectionSort(currArr);
-    } else if (sortType === 'insertion_sort') {
-        await insertionSort(currArr);
-    } else if (sortType === 'merge_sort') {
-        await mergeSort(currArr);
-        currArr.forEach(r => r.classList = 'sorted');
-        await pause(speed);
-        currArr.forEach(r => r.classList = '');
-    } else if (sortType === 'quick_sort') {
-        await quickSort(currArr);
-    } else if (sortType === 'radix_sort') {
-        await radixSort(currArr);
-    } else if (sortType === 'heap_sort') {
-        await heapSort(currArr);
+    await SORT_TYPES[sortType].sort(context.currArr);
+
+    if (sortType === 'merge_sort') {
+        context.currArr.forEach((r:any) => r.classList = 'sorted');
+        await pause(context.speed);
+        context.currArr.forEach((r:any)=> r.classList = '');
     }
 
     updateNumbers();
     enableControls(true);
 }
 
-export function findMaxVal(arr) {
-    let max = -Infinity;
+export function findMaxVal(arr: Array<number>): number {
+    let max: number = -Infinity;
+
     for (let elem of arr) {
         max = Math.max(max, elem);
     }
+
     return max;
 }
 
@@ -47,10 +44,10 @@ export function generateCustomArray() {
     let nums = values.split(' ');
     let error = false;
 
-    document.getElementById('errors').innerText = '';
+    document.getElementById('errors')!.innerText = '';
 
     if (nums.length < 10 || nums.length > 50 || nums[0] === '') {
-        document.getElementById('errors').innerText = 'Number of elements must be from 10 to 50';
+        document.getElementById('errors')!.innerText = 'Number of elements must be from 10 to 50';
         return;
     }
 
@@ -62,20 +59,20 @@ export function generateCustomArray() {
     }
 
     if (error) {
-        document.getElementById('errors').innerText = 'Check values for correctness';
+        document.getElementById('errors')!.innerText = 'Check values for correctness';
     } else {
         let vals = createCustomArray(nums);
 
-        barCount = vals.length;
-        document.getElementById('bar_count').setAttribute('value', barCount);
+        context.barCount = vals.length;
+        document.getElementById('bar_count')!.setAttribute('value', String(context.barCount));
         inputBarCount();
-        barWidth = (width + barPadding) / barCount - barPadding;
+        context.barWidth = (context.width + context.barPadding) / context.barCount - context.barPadding;
         draw(vals);
 
-        comparisons = 0;
-        arrayAccesses = 0;
+        context.comparisons = 0;
+        context.arrayAccesses = 0;
 
-        document.getElementById('values').value = '';
+        (document.getElementById('values') as HTMLInputElement)!.value = '';
     }
 }
 
@@ -83,19 +80,19 @@ export function generateRandomArray() {
     let vals = createRandomArray();
     draw(vals);
 
-    comparisons = 0;
-    arrayAccesses = 0;
+    context.comparisons = 0;
+    context.arrayAccesses = 0;
 }
 
-export function draw(arr) {
-    maxVal = findMaxVal(arr);
+export function draw(arr: Array<number>): void {
+    context.maxVal = findMaxVal(arr);
 
-    yScale = d3.scaleLinear()
-        .domain([0, maxVal])
-        .range([0, height - TOP_PADDING]);
+    context.yScale = d3.scaleLinear()
+        .domain([0, context.maxVal])
+        .range([0, context.height - TOP_PADDING]);
 
     // UPDATE selection
-    let updateSelection = svg.selectAll('.bar')
+    let updateSelection = context.svg.selectAll('.bar')
         .data(arr);
 
     // EXIT selection
@@ -113,64 +110,70 @@ export function draw(arr) {
 
     enterSelection.merge(updateSelection)
         .select('rect')
-        .attr('width', barWidth)
-        .attr('height', d => yScale(d))
-        .attr('x', (d, i) => (barWidth + barPadding) * i)
-        .attr('y', d => height - yScale(d))
-        .attr('val', d => d);
+        .attr('width', context.barWidth)
+        .attr('height', (d: any) => context.yScale(d))
+        .attr('x', (d: any, i: any) => (context.barWidth + context.barPadding) * i)
+        .attr('y', (d: any) => context.height - context.yScale(d))
+        .attr('val', (d: any) => d);
 
     enterSelection.merge(updateSelection)
         .select('text')
-        .text(d => d)
-        .attr('x', (d, i) => (barWidth + barPadding) * i + barWidth / 2)
-        .attr('y', d => height - 10)
+        .text((d: any) => d)
+        .attr('x', (d: any, i: any) => (context.barWidth + context.barPadding) * i + context.barWidth / 2)
+        .attr('y', (d: any) => context.height - 10)
         .attr('text-anchor', 'middle');
 }
 
-export function enableControls(enabled) {
-    document.getElementsByName('sort').forEach(e => e.disabled = !enabled);
-    document.getElementsByName('text').forEach(e => e.disabled = !enabled);
+export function enableControls(enabled: boolean): void {
+    document.getElementsByName('sort').forEach((e: any) => e.disabled = !enabled);
+    document.getElementsByName('text').forEach((e: any) => e.disabled = !enabled);
 
-    document.getElementById('sort').disabled = !enabled;
-    document.getElementById('bar_count').disabled = !enabled;
-    document.getElementById('generate').disabled = !enabled;
-    document.getElementById('apply').disabled = !enabled;
+    (document.getElementById('sort') as HTMLSelectElement)!.disabled = !enabled;
+    (document.getElementById('bar_count') as HTMLSelectElement)!.disabled = !enabled;
+    (document.getElementById('generate') as HTMLSelectElement)!.disabled = !enabled;
+    (document.getElementById('apply') as HTMLSelectElement)!.disabled = !enabled;
 }
 
-export function updateDisplayData(algorithmName = null, desc = null) {
-    if (algorithmName != null) document.getElementById('description').innerHTML = descriptions[algorithmName];
-    else document.getElementById('description').innerHTML = desc;
+export function updateDisplayData(algorithmName: string | null = null, desc = '') {
+    if (algorithmName != null) {
+        document.getElementById('description')!.innerHTML = DESCRIPTIONS[algorithmName];
+    } else {
+        document.getElementById('description')!.innerHTML = desc;
+    }
 }
 
 export function updateNumbers() {
-    document.getElementById('comparisons').innerHTML = comparisons > 0 ? `${comparisons}` : `N/A`;
+    document.getElementById('comparisons')!.innerHTML = context.comparisons > 0 ? `${context.comparisons}` : `N/A`;
 
-    document.getElementById('array_manipulations').innerHTML = arrayAccesses > 0 ? `${arrayAccesses}` : `N/A`;
+    document.getElementById('array_manipulations')!.innerHTML = context.arrayAccesses > 0 ? `${context.arrayAccesses}` : `N/A`;
 }
 
 export function hideText() {
-    let textElem = document.getElementsByTagName('text');
+    const textElem: any = document.getElementsByTagName('text');
+
     for (let t of textElem) {
         t.classList = 'hidden';
     }
 }
 
 export function showText() {
-    let textElem = document.getElementsByTagName('text');
+    const textElem: any = document.getElementsByTagName('text');
+
     for (let t of textElem) {
         t.classList = '';
     }
 }
 
 export function inputBarCount() {
-    barCount = parseInt(document.getElementById('bar_count').value);
-    document.getElementById('count').innerText = barCount;
+    context.barCount = parseInt((document.getElementById('bar_count') as HTMLSelectElement)!.value);
+    document.getElementById('count')!.innerText = String(context.barCount);
 }
 
 export function changeBarCount() {
-    let vals = createRandomArray();
-    barWidth = (width + barPadding) / barCount - barPadding;
-    draw(vals);
+    const values: Array<number> = createRandomArray();
 
-    textModeEnabled ? showText() : hideText();
+    context.barWidth = (context.width + context.barPadding) / context.barCount - context.barPadding;
+    draw(values);
+
+    context.textModeEnabled ? showText() : hideText();
 }

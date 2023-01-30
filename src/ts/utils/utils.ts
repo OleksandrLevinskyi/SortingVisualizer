@@ -9,14 +9,14 @@ export function getRectValue(rect: any): number {
     return parseInt(rect.getAttribute('val'))
 }
 
-export function getSelectedRadioValue(name: string): string | undefined {
+export function getSelectedRadioValue(name: string): string {
     const buttons: any = document.getElementsByName(name);
 
     for (let b of buttons) {
         if (b.checked) return b.value;
     }
 
-    return undefined;
+    return '';
 }
 
 export function createCustomArray(arr: Array<any>): Array<any> {
@@ -27,7 +27,7 @@ export function createCustomArray(arr: Array<any>): Array<any> {
     return arr;
 }
 
-export function createRandomArray(arr:Array<any>):Array<any> {
+export function createRandomArray(): Array<number> {
     const context: Context = Context.getContext();
     const newArr = new Array(context.barCount);
 

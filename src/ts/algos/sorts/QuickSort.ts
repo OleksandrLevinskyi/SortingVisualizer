@@ -4,7 +4,7 @@ import {Context} from "../../Context";
 import {swap} from "../../utils/sort_utils";
 import {updateNumbers} from "../../utils/panel_utils";
 
-class QuickSort implements ISortStrategy {
+export class QuickSort implements ISortStrategy {
     async sort(arr: Array<any>, start = 0, end = arr.length - 1): Promise<any> {
         const context: Context = Context.getContext();
 

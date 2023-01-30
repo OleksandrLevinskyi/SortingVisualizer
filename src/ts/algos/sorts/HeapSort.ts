@@ -4,7 +4,7 @@ import {Context} from "../../Context";
 import {swap} from "../../utils/sort_utils";
 import {updateNumbers} from "../../utils/panel_utils";
 
-class HeapSort implements ISortStrategy {
+export class HeapSort implements ISortStrategy {
     async sort(arr: Array<any>): Promise<void> {
         const context: Context = Context.getContext();
         let n = arr.length;

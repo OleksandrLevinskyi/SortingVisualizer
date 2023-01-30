@@ -4,7 +4,7 @@ import {Context} from "../../Context";
 import {updateNumbers} from "../../utils/panel_utils";
 import {swap} from "../../utils/sort_utils";
 
-class BubbleSort implements ISortStrategy {
+export class BubbleSort implements ISortStrategy {
     async sort(arr: Array<any>): Promise<Array<any>> {
         const context: Context = Context.getContext();
         let swapped = false;

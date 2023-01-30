@@ -3,7 +3,7 @@ import {getRectValue, pause} from "../../utils/utils";
 import {Context} from "../../Context";
 import {updateNumbers} from "../../utils/panel_utils";
 
-class RadixSort implements ISortStrategy {
+export class RadixSort implements ISortStrategy {
     async sort(arr: Array<any>): Promise<Array<any>> {
         const context: Context = Context.getContext();
         let vals: Array<number>;

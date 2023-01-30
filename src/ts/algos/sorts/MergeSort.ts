@@ -3,7 +3,7 @@ import {getRectValue, pause} from "../../utils/utils";
 import {Context} from "../../Context";
 import {updateNumbers} from "../../utils/panel_utils";
 
-class MergeSort implements ISortStrategy {
+export class MergeSort implements ISortStrategy {
     async sort(arr: Array<any>, startIdx = 0): Promise<Array<any>> {
         const context: Context = Context.getContext();
         let middle = Math.floor(arr.length / 2);

@@ -1,4 +1,11 @@
-import {Descriptions} from "./types";
+import {Descriptions, SortStrategies} from "./types";
+import {BubbleSort} from "./algos/sorts/BubbleSort";
+import {SelectionSort} from "./algos/sorts/SelectionSort";
+import {InsertionSort} from "./algos/sorts/InsertionSort";
+import {MergeSort} from "./algos/sorts/MergeSort";
+import {QuickSort} from "./algos/sorts/QuickSort";
+import {RadixSort} from "./algos/sorts/RadixSort";
+import {HeapSort} from "./algos/sorts/HeapSort";
 
 export const MAX_BAR_COUNT = 200;
 export const MAX_BAR_COUNT_WITH_TEXT = 45;
@@ -13,4 +20,14 @@ export const DESCRIPTIONS: Descriptions = {
     'merge_sort': "<b>Merge Sort</b> splits array into 1-element sub-arrays, then merges them together <br> Time: <i>O(nlogn)</i>; Space: <i>O(n)</i>",
     'quick_sort': "<b>Quick Sort</b> selects and places the 'pivots' in correct spots <br> Time: <i>O(n<sup>2</sup>)</i>; Space: <i>O(1)</i>",
     'heap_sort': "<b>Heap Sort</b> exploits max heap <br> Time: <i>O(nlogn)</i>; Space: <i>O(1)</i>"
+}
+
+export const SORT_TYPES: SortStrategies = {
+    'bubble_sort': new BubbleSort(),
+    'selection_sort': new SelectionSort(),
+    'insertion_sort': new InsertionSort(),
+    'merge_sort': new MergeSort(),
+    'quick_sort': new QuickSort(),
+    'radix_sort': new RadixSort(),
+    'heap_sort': new HeapSort(),
 }
