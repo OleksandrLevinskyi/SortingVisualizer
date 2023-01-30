@@ -17,17 +17,19 @@ export class Context {
     yScale: any;
 
     private constructor() {
+        this.currArr = [];
         this.sortFinished = false;
         this.textModeEnabled = true;
         this.svg = document.querySelector('svg');
         this.width = parseInt(window.getComputedStyle(this.svg).getPropertyValue('width'));
         this.height = window.innerHeight * .7;
-        this.barCount = parseInt(document.getElementById('bar_count')?.value);
+        this.barCount = parseInt((document.getElementById('bar_count') as HTMLSelectElement)?.value);
         this.barPadding = 1;
         this.barWidth = (this.width + this.barPadding) / this.barCount - this.barPadding;
-        this.speed = parseInt(document.getElementById('delay')?.value);
+        this.speed = parseInt((document.getElementById('delay') as HTMLSelectElement)?.value);
         this.comparisons = 0;
         this.arrayAccesses = 0;
+        this.maxVal = 0;
     }
 
     public static getContext() {
