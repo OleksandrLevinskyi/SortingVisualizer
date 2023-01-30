@@ -1,9 +1,10 @@
-import {SortStrategy} from "../SortStrategy";
-import {pause} from "../../utils/utils";
+import {ISortStrategy} from "../ISortStrategy";
+import {changeClassList, getRectValue, pause} from "../../utils/utils";
 import {Context} from "../../Context";
+import {updateNumbers} from "../../utils/panel_utils";
 
-class BubbleSort implements SortStrategy {
-    async sort(arr: Array<number>): Promise<Array<number>> {
+class BubbleSort implements ISortStrategy {
+    async sort(arr: Array<any>): Promise<Array<any>> {
         const context: Context = Context.getContext();
         let swapped = false;
 
@@ -11,60 +12,71 @@ class BubbleSort implements SortStrategy {
             swapped = false;
             for (let j = 1; j < i; j++) {
                 await pause(context.speed);
-                arr[j - 1].classList = 'curr';
-                arr[j].classList = 'curr';
+
+                changeClassList(arr[j - 1], ['curr']);
+                changeClassList(arr[j], ['curr']);
+
                 if (getRectValue(arr[j - 1]) > getRectValue(arr[j])) {
-                    await swap(arr, j - 1, j);
+                    await this.swap(arr, j - 1, j);
                     swapped = true;
                 }
+
                 await pause(context.speed);
-                arr[j - 1].classList = '';
+                changeClassList(arr[j - 1]);
 
                 context.comparisons++;
                 updateNumbers();
             }
-            arr[i - 1].classList = 'sorted';
-            if (!swapped) break;
+
+            changeClassList(arr[i - 1], ['sorted']);
+
+            if (!swapped) {
+                break;
+            }
         }
 
-        arr.forEach(r => r.classList = 'sorted');
+        arr.forEach(r => changeClassList(r, ['sorted']));
         await pause(context.speed);
-        arr.forEach(r => r.classList = '');
+        arr.forEach(r => changeClassList(r));
 
         return arr;
     }
 
-    async swap(arr: Array<number>, i: number, j: number, swapClassLists = true) {
+    async swap(arr: Array<any>, i: number, j: number, swapClassLists = true) {
         const context: Context = Context.getContext();
 
         context.arrayAccesses += 2;
 
         await pause(context.speed);
 
-        let tempVal = getRectValue(arr[i]);
+        const tempVal = getRectValue(arr[i]);
         arr[i].setAttribute('val', getRectValue(arr[j]));
         arr[j].setAttribute('val', tempVal);
 
-        let tempY = arr[i].getAttribute('y');
+        const tempY = arr[i].getAttribute('y');
         arr[i].setAttribute('y', arr[j].getAttribute('y'));
         arr[j].setAttribute('y', tempY);
 
-        let tempHeight = arr[i].getAttribute('height');
+        const tempHeight = arr[i].getAttribute('height');
         arr[i].setAttribute('height', arr[j].getAttribute('height'));
         arr[j].setAttribute('height', tempHeight);
 
         if (swapClassLists) {
-            let classList1 = "", classList2 = "";
-            arr[i].classList.forEach(e => classList1 += e);
-            arr[j].classList.forEach(e => classList2 += e);
+            let classList1 = '';
+            let classList2 = '';
+
+            arr[i].classList.forEach((e: string) => classList1 += e);
+            arr[j].classList.forEach((e: string) => classList2 += e);
+
             arr[i].classList = classList2
             arr[j].classList = classList1;
         }
 
         if (context.textModeEnabled) {
-            let text1 = arr[i].parentNode.querySelector('text');
-            let text2 = arr[j].parentNode.querySelector('text');
-            let tempText = text1.innerHTML;
+            const text1 = arr[i].parentNode.querySelector('text');
+            const text2 = arr[j].parentNode.querySelector('text');
+            const tempText = text1.innerHTML;
+
             text1.innerHTML = text2.innerHTML;
             text2.innerHTML = tempText;
         }

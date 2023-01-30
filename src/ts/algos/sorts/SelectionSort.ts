@@ -1,8 +1,8 @@
-import {SortStrategy} from "../SortStrategy";
+import {ISortStrategy} from "../ISortStrategy";
 import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
-class SelectionSort implements SortStrategy {
+class SelectionSort implements ISortStrategy {
     async sort(arr: Array<number>): Promise<Array<number>> {
         let minIdx = 0,
             prev = null;

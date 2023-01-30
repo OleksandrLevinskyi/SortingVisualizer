@@ -1,8 +1,8 @@
-import {SortStrategy} from "../SortStrategy";
+import {ISortStrategy} from "../ISortStrategy";
 import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
-class HeapSort implements SortStrategy {
+class HeapSort implements ISortStrategy {
     async sort(arr: Array<number>): Promise<Array<number>> {
         let n = arr.length;
         let a = Math.floor(n / 2) - 1; // idx of the first element with children

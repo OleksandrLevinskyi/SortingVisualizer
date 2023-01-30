@@ -1,8 +1,8 @@
-import {SortStrategy} from "../SortStrategy";
+import {ISortStrategy} from "../ISortStrategy";
 import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
-class RadixSort implements SortStrategy {
+class RadixSort implements ISortStrategy {
     async sort(arr: Array<number>): Promise<Array<number>> {
         let vals, max, prev, idxs;
 

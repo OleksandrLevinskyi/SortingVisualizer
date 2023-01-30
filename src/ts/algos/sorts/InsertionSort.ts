@@ -1,8 +1,8 @@
-import {SortStrategy} from "../SortStrategy";
+import {ISortStrategy} from "../ISortStrategy";
 import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
-class InsertionSort implements SortStrategy {
+class InsertionSort implements ISortStrategy {
     async sort(arr: Array<number>): Promise<Array<number>> {
         arr[0].classList = 'sorted';
 
