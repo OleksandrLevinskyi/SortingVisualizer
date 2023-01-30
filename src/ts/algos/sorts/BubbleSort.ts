@@ -1,10 +1,10 @@
 import {SortStrategy} from "../SortStrategy";
-import {pause} from "../../utils";
+import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
 class BubbleSort implements SortStrategy {
     async sort(arr: Array<number>): Promise<Array<number>> {
-        const context = Context.getContext();
+        const context: Context = Context.getContext();
         let swapped = false;
 
         for (let i = arr.length; i > 1; i--) {
@@ -35,7 +35,7 @@ class BubbleSort implements SortStrategy {
     }
 
     async swap(arr: Array<number>, i: number, j: number, swapClassLists = true) {
-        const context = Context.getContext();
+        const context: Context = Context.getContext();
 
         context.arrayAccesses += 2;
 

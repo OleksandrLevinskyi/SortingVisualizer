@@ -1,5 +1,5 @@
 import {SortStrategy} from "../SortStrategy";
-import {pause} from "../../utils";
+import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
 
 class QuickSort implements SortStrategy {

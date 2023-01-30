@@ -1,71 +1,3 @@
-/* initial radio button idea: https://codepen.io/echosoft/pen/RaVEvG */
-
-ul {
-    list-style-type: none;
-}
-
-li {
-    display: inline-block;
-}
-
-input.special[type="radio"][id^="text"],
-input.special[type="radio"][id^="mode"] {
-    display: none;
-}
-
-label.special {
-    border: 1px solid #fff;
-    padding: 5px 5px;
-    display: block;
-    position: relative;
-    margin: 2px;
-    cursor: pointer;
-    z-index: 1;
-}
-
-label.special:before {
-    background-color: white;
-    color: white;
-    content: " ";
-    display: block;
-    border-radius: 50%;
-    border: 1px solid #0275d8;
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    width: 15px;
-    height: 15px;
-    text-align: center;
-    line-height: 10px;
-    transition-duration: 0.4s;
-    transform: scale(0);
-}
-
-label.special img {
-    height: 2rem;
-    width: 2rem;
-    transition-duration: 0.2s;
-    transform-origin: 50% 50%;
-}
-
-:checked+label.special {
-    border-color: #ddd;
-}
-
-:checked+label.special:before {
-    content: "✓";
-    background-color: #0275d8;
-    transform: scale(1);
-}
-
-:checked+label.special img {
-    transform: scale(0.9);
-    /*   box-shadow: 0 0 5px #333; */
-    z-index: -1;
-}
-
-
-/* other */
 hr {
     margin: 5px 0;
     background-color: grey;
@@ -122,13 +54,7 @@ span.data {
     font-weight: 100;
 }
 
-
-/* input, button {
-    background-color: #0c3547;
-} */
-
 input#values {
-    /* font-size: 18px; */
     padding: 5px 5px 5px 5px;
     display: block;
     width: 90%;

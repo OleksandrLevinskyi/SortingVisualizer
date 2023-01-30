@@ -1,42 +1,33 @@
 export class Context {
     private static context: Context | null = null;
 
+    currArr: Array<number>;
+    sortFinished: boolean;
+    textModeEnabled: boolean;
+    svg: any;
+    width: number;
+    height: number;
     speed: number;
     comparisons: number;
     arrayAccesses: number;
-    textModeEnabled: boolean;
-
-    grid;
-    pathSearchFinished: boolean;
-    algoFinished: boolean;
-    isAnimationCancelled: boolean;
-    width: number;
-    height: number
-    colCount: number;
-    cellSize: number;
-    tempCount: number;
-    rowCount: number;
-    changeRectTypeEnabled: boolean;
-    currObstacle: string;
-    totalCost: number;
-    totalNodesVisited: number;
+    barCount: number;
+    barPadding: number;
+    barWidth: number;
+    maxVal: number;
+    yScale: any;
 
     private constructor() {
-        this.pathSearchFinished = false;
-        this.algoFinished = true;
-        this.changeRectTypeEnabled = true;
-        this.isAnimationCancelled = false;
-        this.grid = document.querySelector('.grid');
-        this.width = window.innerWidth;
-        this.height = window.innerHeight - document.getElementById('control-panel')!.offsetHeight;
-        this.colCount = parseInt((document.getElementById('dimension') as HTMLButtonElement).value);
-        this.cellSize = this.width / this.colCount;
-        this.tempCount = Math.floor(this.height / this.cellSize);
-        this.rowCount = this.tempCount % 2 == 1 ? this.tempCount : this.tempCount - 1;
-        this.speed = parseInt((document.getElementById('delay') as HTMLInputElement).value);
-        this.currObstacle = getSelectedRadioButtonValue("obstacle");
-        this.totalCost = 0;
-        this.totalNodesVisited = 0;
+        this.sortFinished = false;
+        this.textModeEnabled = true;
+        this.svg = document.querySelector('svg');
+        this.width = parseInt(window.getComputedStyle(this.svg).getPropertyValue('width'));
+        this.height = window.innerHeight * .7;
+        this.barCount = parseInt(document.getElementById('bar_count')?.value ?? 0);
+        this.barPadding = 1;
+        this.barWidth = (this.width + this.barPadding) / this.barCount - this.barPadding;
+        this.speed = parseInt(document.getElementById('delay')?.value ?? 0);
+        this.comparisons = 0;
+        this.arrayAccesses = 0;
     }
 
     public static getContext() {
