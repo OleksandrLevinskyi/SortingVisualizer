@@ -1,3 +1,5 @@
+import {ISortStrategy} from "./algos/ISortStrategy";
+
 export enum TEXT_CAPTION {
     PRESENT = 'true',
     NONE = 'false',
@@ -5,6 +7,10 @@ export enum TEXT_CAPTION {
 
 export type Descriptions = {
     [key: string]: string
+}
+
+export type SortStrategies = {
+    [key: string]: ISortStrategy
 }
 
 export enum MODE_IMAGE {
