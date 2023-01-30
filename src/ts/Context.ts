@@ -1,7 +1,7 @@
 export class Context {
     private static context: Context | null = null;
 
-    currArr: Array<number>;
+    currArr: Array<any>;
     sortFinished: boolean;
     textModeEnabled: boolean;
     svg: any;

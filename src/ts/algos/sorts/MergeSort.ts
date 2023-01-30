@@ -1,17 +1,21 @@
 import {ISortStrategy} from "../ISortStrategy";
 import {pause} from "../../utils/utils";
 import {Context} from "../../Context";
+import {sort} from "../../utils/panel_utils";
 
 class MergeSort implements ISortStrategy {
     async sort(arr: Array<any>, startIdx = 0): Promise<Array<any>> {
         const context: Context = Context.getContext();
         let middle = Math.floor(arr.length / 2);
-        if (middle == 0) return arr;
 
-        let left = await mergeSort(arr.slice(0, middle), startIdx);
-        let right = await mergeSort(arr.slice(middle), startIdx + middle);
+        if (middle == 0) {
+            return arr;
+        }
 
-        return await merge(left, right, startIdx);
+        let left = await this.sort(arr.slice(0, middle), startIdx);
+        let right = await this.sort(arr.slice(middle), startIdx + middle);
+
+        return await this.merge(left, right, startIdx);
     }
 
     async merge(arr1, arr2, startIdx) {
