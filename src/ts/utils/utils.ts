@@ -1,13 +1,16 @@
-export function pause(ms: number) {
+import {Context} from "../Context";
+import {MAX_BAR_VALUE} from "../constants";
+
+export function pause(ms: number): Promise<number> {
     return new Promise<number>((resolve: any) => setTimeout(resolve, ms));
 }
 
-export function getRectValue(rect) {
+export function getRectValue(rect: any): number {
     return parseInt(rect.getAttribute('val'))
 }
 
-export function getSelectedRadioValue(name) {
-    var buttons = document.getElementsByName(name);
+export function getSelectedRadioValue(name: string): string | undefined {
+    const buttons: any = document.getElementsByName(name);
 
     for (let b of buttons) {
         if (b.checked) return b.value;
@@ -16,21 +19,22 @@ export function getSelectedRadioValue(name) {
     return undefined;
 }
 
-export function createCustomArray(arr) {
+export function createCustomArray(arr: Array<any>): Array<any> {
     for (let i = 0; i < arr.length; i++) {
         arr[i] = parseInt(arr[i]);
     }
+
     return arr;
 }
 
-// construct a random array
-export function createRandomArray(arr) {
-    // let numBars = Math.round(Math.random() * 500) + 50; // from 5 to 15
-    let numBars = barCount;
-    let newArr = new Array(numBars);
+export function createRandomArray(arr:Array<any>):Array<any> {
+    const context: Context = Context.getContext();
+    const newArr = new Array(context.barCount);
+
     for (let i = 0; i < newArr.length; i++) {
         newArr[i] = Math.round(Math.random() * MAX_BAR_VALUE);
     }
+
     return newArr;
 }
 
