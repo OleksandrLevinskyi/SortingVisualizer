@@ -22,10 +22,10 @@ export class Context {
         this.svg = document.querySelector('svg');
         this.width = parseInt(window.getComputedStyle(this.svg).getPropertyValue('width'));
         this.height = window.innerHeight * .7;
-        this.barCount = parseInt(document.getElementById('bar_count')?.value ?? 0);
+        this.barCount = parseInt(document.getElementById('bar_count')?.value);
         this.barPadding = 1;
         this.barWidth = (this.width + this.barPadding) / this.barCount - this.barPadding;
-        this.speed = parseInt(document.getElementById('delay')?.value ?? 0);
+        this.speed = parseInt(document.getElementById('delay')?.value);
         this.comparisons = 0;
         this.arrayAccesses = 0;
     }

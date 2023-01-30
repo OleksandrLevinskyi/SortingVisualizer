@@ -1,7 +1,7 @@
 import {Descriptions} from "./types";
 
 export const MAX_BAR_COUNT = 200;
-export const MAX_BAR_COUNT_TEXT = 45;
+export const MAX_BAR_COUNT_WITH_TEXT = 45;
 export const MAX_BAR_VALUE = 1000;
 export const TOP_PADDING = 20;
 

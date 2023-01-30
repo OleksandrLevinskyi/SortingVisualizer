@@ -1,5 +1,14 @@
-import {generateRandomArray} from "./utils/panel_utils";
+import {
+    changeBarCount,
+    generateCustomArray,
+    generateRandomArray,
+    hideText,
+    inputBarCount,
+    showText, sort
+} from "./utils/panel_utils";
 import {Context} from "./Context";
+import {changeClassList} from "./utils/utils";
+import {MAX_BAR_COUNT, MAX_BAR_COUNT_WITH_TEXT} from "./constants";
 
 document.addEventListener('DOMContentLoaded', () => loadApp());
 
@@ -18,21 +27,23 @@ function addEventHandlers() {
     const context: Context = Context.getContext();
 
     document.getElementById('mode_day')?.addEventListener('click', () => {
-        document.querySelector('body')!.classList = '';
-        document.querySelector('#values').classList = '';
+        changeClassList(document.querySelector('body')!);
+        changeClassList(document.getElementById('values')!);
     });
 
-    document.getElementById('mode_night').addEventListener('click', () => {
-        document.querySelector('body').classList = 'night_mode';
-        document.querySelector('#values').classList = 'night_mode';
+    document.getElementById('mode_night')?.addEventListener('click', () => {
+        changeClassList(document.querySelector('body')!, ['night_mode']);
+        changeClassList(document.getElementById('values')!, ['night_mode']);
     });
 
-    document.getElementById('text_true').addEventListener('click', () => {
-        textModeEnabled = true;
-        document.getElementById('bar_count').setAttribute('max', MAX_BAR_COUNT_TEXT);
-        if (barCount > MAX_BAR_COUNT_TEXT) {
-            barCount = MAX_BAR_COUNT_TEXT;
-            document.getElementById('bar_count').setAttribute('value', MAX_BAR_COUNT_TEXT);
+    document.getElementById('text_true')!.addEventListener('click', () => {
+        context.textModeEnabled = true;
+        document.getElementById('bar_count')!.setAttribute('max', String(MAX_BAR_COUNT_WITH_TEXT));
+
+        if (context.barCount > MAX_BAR_COUNT_WITH_TEXT) {
+            context.barCount = MAX_BAR_COUNT_WITH_TEXT;
+            document.getElementById('bar_count')!.setAttribute('value', String(MAX_BAR_COUNT_WITH_TEXT));
+
             inputBarCount();
             changeBarCount();
         } else {
@@ -40,23 +51,23 @@ function addEventHandlers() {
         }
     });
 
-    document.getElementById('text_false').addEventListener('click', () => {
-        textModeEnabled = false;
-        document.getElementById('bar_count').setAttribute('max', MAX_BAR_COUNT);
+    document.getElementById('text_false')!.addEventListener('click', () => {
+        context.textModeEnabled = false;
+        document.getElementById('bar_count')!.setAttribute('max', String(MAX_BAR_COUNT));
 
         hideText();
     });
 
-    document.getElementById('delay').addEventListener("input", () => {
-        speed = parseInt(document.getElementById('delay').value);
-        document.getElementById('animation_delay').innerText = speed;
+    document.getElementById('delay')!.addEventListener("input", () => {
+        context.speed = parseInt((document.getElementById('delay') as HTMLSelectElement)!.value);
+        document.getElementById('animation_delay')!.innerText = String(context.speed);
     });
 
-    document.getElementById('bar_count').addEventListener("input", inputBarCount);
+    document.getElementById('bar_count')!.addEventListener("input", inputBarCount);
 
-    document.getElementById('bar_count').addEventListener("change", changeBarCount);
+    document.getElementById('bar_count')!.addEventListener("change", changeBarCount);
 
-    document.getElementById('apply').addEventListener('click', generateCustomArray);
-    document.getElementById('generate').addEventListener('click', generateRandomArray);
-    document.getElementById('sort').addEventListener('click', sort);
+    document.getElementById('apply')!.addEventListener('click', generateCustomArray);
+    document.getElementById('generate')!.addEventListener('click', generateRandomArray);
+    document.getElementById('sort')!.addEventListener('click', sort);
 }
