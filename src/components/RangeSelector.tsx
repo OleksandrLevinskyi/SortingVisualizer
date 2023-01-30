@@ -18,7 +18,7 @@ const RangeSelector: Component<RangeSelectorProps> = ({id, title, statId, unit, 
                 <span class="fw-lighter fs-sm"> (<span id={statId}/> {unit})</span>
             </label>
 
-            <input type="range" class="form-range w-100" min={min} max={max} step={step} id={id}/>
+            <input type="range" class="form-range w-90" min={min} max={max} step={step} id={id}/>
         </div>
     );
 };

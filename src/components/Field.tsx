@@ -4,7 +4,7 @@ import ControlPanel from "./ControlPanel";
 const Field: Component = () => {
     return (
         <div class="row">
-            <div class="col-md-12 not_padded">
+            <div class="col-md-12 p-0">
                 <svg></svg>
             </div>
         </div>

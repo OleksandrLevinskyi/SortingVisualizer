@@ -22,7 +22,7 @@ export class Context {
         this.textModeEnabled = true;
         this.svg = document.querySelector('svg');
         this.width = parseInt(window.getComputedStyle(this.svg).getPropertyValue('width'));
-        this.height = window.innerHeight * .7;
+        this.height = window.innerHeight - document.getElementById('control-panel')!.offsetHeight;
         this.barCount = parseInt((document.getElementById('count') as HTMLSelectElement)?.value);
         this.barPadding = 1;
         this.barWidth = (this.width + this.barPadding) / this.barCount - this.barPadding;

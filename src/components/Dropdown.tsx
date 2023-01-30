@@ -3,7 +3,7 @@ import type {Component} from 'solid-js';
 const Dropdown: Component = () => {
     return (
             <div class="btn-group w-100" role="group" aria-label="algorithms">
-                <select class="w-75" name="sort" id="sort">
+                <select class="w-100" name="sort" id="sort">
                     <option value="bubble_sort">Bubble Sort</option>
                     <option value="selection_sort">Selection Sort</option>
                     <option value="insertion_sort">Insertion Sort</option>

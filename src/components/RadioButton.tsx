@@ -9,7 +9,7 @@ type RadioButtonProps = {
 const RadioButton: Component<RadioButtonProps> = ({type, isChecked}) => {
     return (
         <>
-            <input type="radio" class="btn-check w-50" name="text"
+            <input type="radio" class="btn-check" name="text"
                    id={`text_${type}`} value={type} autocomplete="off" checked={isChecked}/>
             <label
                 class="btn btn-outline-primary d-inline-flex align-items-center justify-content-start p-0 ps-1 pe-1"
