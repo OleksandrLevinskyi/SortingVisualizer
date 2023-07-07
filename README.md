@@ -30,7 +30,7 @@ You can create a custom array by entering space separated values (min 10 - max 5
 * 'Sort' button - starts the alogrithm animation
 
 # Try It
-You can access this app on: https://sorting-visualizations.herokuapp.com/ (please read the instructions above on how to use it)
+You can access this app on: WIP/currently unavailable (please refer to the video demo to see how the app works)
 
 NOTE:
 * please launch this app in Chrome browser only
