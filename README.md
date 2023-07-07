@@ -1,6 +1,8 @@
 # SortingVisualizer
 It is an interactive application built for visualizing sorting algorithms to understand your understanding of them. There are implemented 7 algorithms: Heap, Quick, Merge, Radix, Intertion, Selection, and Bubble sorts.
 
+# Video Demo
+https://youtu.be/rX1Lkq9q-QQ
 
 # Instructions
 Choose one out of 7 sorting algorithms.
